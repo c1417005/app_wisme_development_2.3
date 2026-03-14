@@ -1,0 +1,18 @@
+{% extends "base/wisme_base.html" %}
+{% block body %}
+
+<form method = "POST">
+        {% csrf_token %}
+        <p>このコンテンツを削除して良いですか？</p>
+        <button type = "submit">削除</button>
+</form>
+<h2>{{page.title}}</h2>
+<div>{{page.page_date}}</div>
+<div>{{page.input_word}}</div>
+<div>{{page.return_mean}}</div>
+<div>{{page.thoughts | linebreaksbr}}</div>
+{% if page.picture %}
+<img src="{{ page.picture.url }}"/>
+{% endif %}
+
+{% endblock%}

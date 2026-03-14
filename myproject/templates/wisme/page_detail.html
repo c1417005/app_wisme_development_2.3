@@ -1,0 +1,20 @@
+{% extends "base/wisme_base.html" %}
+{% block body %}
+
+<h2>{{page.title}}</h2>
+<div>{{page.page_date}}</div>
+<div>{{page.input_word}}</div>
+<div>{{page.return_mean}}</div>
+<div>{{page.thoughts | linebreaksbr}}</div>
+{% if page.picture %}
+<img src="{{ page.picture.url }}"/>
+{% endif %}
+
+<br>
+<a href="{% url 'wisme:page_update' page.id %}">編集</a>
+<a href="{% url 'wisme:page_delete' page.id %}">削除</a>
+
+
+
+
+{% endblock%}

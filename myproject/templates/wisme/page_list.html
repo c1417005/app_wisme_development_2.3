@@ -1,0 +1,12 @@
+{% extends "base/wisme_base.html" %}
+{% block body %}
+
+<ul>
+    {% for page in page_list %}
+        <li>{{ page.page_date }}: <a href="{% url 'wisme:page_detail' page.id %}"> {{ page.title }}</a></li>
+    {% empty %}
+        <div>コンテンツが１つもありません。</div>
+    {% endfor %}
+</ul>
+
+{% endblock%}

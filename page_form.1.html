@@ -1,0 +1,23 @@
+{% extends "base/wisme_base.html" %}
+{% block body %}
+
+    <h2>指定された項目を入力してください</h2>
+    <form method = "POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+            <!-- {% for field in form %} -->
+            <!-- <div class  = "field_container">  -->
+                <!-- {{field.label_tag}}
+                {{field}}
+                {% if field.name == "input_word" %}
+                <button type="button" name = "research">意味を調べる</button>
+                {% endif %}
+
+            {% endfor %} -->
+        <!-- <button type = "submit">送信</button> -->
+        <button type = "submit">保存</button>
+        </div>
+    </form>
+
+
+{% endblock %}

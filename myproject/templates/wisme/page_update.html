@@ -1,0 +1,31 @@
+{% extends "base/wisme_base.html" %}
+{% block body %}
+
+<form method = "POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <!-- {{ form.as_p }} -->
+        {% for field in form %}
+            <div class  = "field_container"> 
+                {{field.label_tag}}
+                {{field}}
+                {% if field.name == "input_word" %}
+                <button type="button" id = "btn_research" name = "research">意味を調べる</button>
+                {% endif %}
+            </div>
+            {% endfor %}
+        <button type = "submit">更新</button>
+</form>
+<table border="1" id = "words_table">
+                    <thead>
+                        <tr>
+                            <th >調べた意味</th>
+                            <th>意味</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+
+<script src = "/static/wisme/js/api.js"></script>
+{% endblock%}

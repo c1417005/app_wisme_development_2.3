@@ -22,7 +22,9 @@ class PageCreateView(View):
         #     print("success")
         if "reserve" in request.POST:
             if form.is_valid():
-                form.save()
+                new_page = form.save()
+                SearchedWord.objects.filter(note__isnull = True).update(note = new_page)
+
                 return redirect("wisme:index")
             return render(request,"wisme/page_form.html",{"form":form})
 
@@ -58,8 +60,8 @@ class PageSendWordReturnMean(View):
         word = request.GET.get('word')
         result =  GeminiAsk(word)
         SearchedWord.objects.create(
-            input_word = word,
-            return_mean = result,
+            word = word,
+            meaning = result,
             note = None
         )
         data = {'meaning': f"{result}"}

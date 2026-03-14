@@ -36,11 +36,7 @@ observer.addEventListener('click',() => {
             cell1.textContent = word;
             cell2.textContent = data.meaning;
 
-            const hiddenInput = document.createElement("input");
-            hiddenInput.type = 'hidden';
-            hiddenInput.name = 'return_mean';
-            hiddenInput.value = data.meaning;
-            cell2.appendChild(hiddenInput);
+            
 
         })
     });

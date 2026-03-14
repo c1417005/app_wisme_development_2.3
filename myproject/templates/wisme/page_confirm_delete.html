@@ -1,18 +1,35 @@
 {% extends "base/wisme_base.html" %}
 {% block body %}
 
-<form method = "POST">
+<form method="POST">
         {% csrf_token %}
         <p>このコンテンツを削除して良いですか？</p>
-        <button type = "submit">削除</button>
+        <button type="submit">削除</button>
 </form>
 <h2>{{page.title}}</h2>
 <div>{{page.page_date}}</div>
-<div>{{page.input_word}}</div>
-<div>{{page.return_mean}}</div>
 <div>{{page.thoughts | linebreaksbr}}</div>
 {% if page.picture %}
-<img src="{{ page.picture.url }}"/>
+<img src="{{ page.picture.url }}" />
 {% endif %}
+<hr>
+
+<table border="1">
+        <thead>
+                <tr>
+                        <th>調べた単語</th>
+                        <th>意味</th>
+                </tr>
+        </thead>
+        <tbody>
+                {% for word in words %}
+                <tr>
+                        <td>{{ word.word }}</td>
+                        <td>{{ word.meaning }}</td>
+                </tr>
+                {% endfor %}
+        </tbody>
+</table>
+
 
 {% endblock%}

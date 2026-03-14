@@ -20,13 +20,12 @@ class PageCreateView(View):
         form = PageForm(request.POST,request.FILES)
         # if "research" in request.POST:
         #     print("success")
-        if "reserve" in request.POST:
-            if form.is_valid():
-                new_page = form.save()
-                SearchedWord.objects.filter(note__isnull = True).update(note = new_page)
-
-                return redirect("wisme:index")
-            return render(request,"wisme/page_form.html",{"form":form})
+        
+        if form.is_valid():
+            new_page = form.save()
+            SearchedWord.objects.filter(note__isnull = True).update(note = new_page)
+            return redirect("wisme:index")
+        return render(request,"wisme/page_form.html",{"form":form})
 
 class PageListView(View):
     def get(self,request):
@@ -37,22 +36,37 @@ class PageListView(View):
 class PageDetailView(View):
     def get(self,request,id):
         page = get_object_or_404(Page,id = id)
-        return render(request,"wisme/page_detail.html",{"page":page})
-    
+        words = page.words.all()
+        contents = {
+            "page":page,
+            "words":words
+        }
+        return render(request,"wisme/page_detail.html",contents)
+    #renderには第三引数までしかおくれないので、一つの辞書にまとめる。
+    #wordsの中身は、wordとmeaning(model参照)
 
 class PageUpdateView(View):
     def get(self,request,id):
         page = get_object_or_404(Page,id = id)
         form = PageForm(instance = page)
-        return render(request,"wisme/page_update.html",{"form":form})
+        words = page.words.all()
+        contents = {
+            "form":form,
+            "words":words
+        }
+        return render(request,"wisme/page_update.html",contents)
     
     def post(self,request,id):
         page = get_object_or_404(Page,id = id)
         form = PageForm(request.POST,request.FILES,instance=page)
         if form.is_valid():
-            form.save()
+            new_page = form.save()
+            SearchedWord.objects.filter(note__isnull = True).update(note = new_page)
             return redirect("wisme:page_detail",id = id)
         return render(request,"wisme/page_form.html",{"form":form})
+    
+  
+
 
 
 class PageSendWordReturnMean(View):
@@ -71,7 +85,13 @@ class PageSendWordReturnMean(View):
 class PageDeleteView(View):
     def get(self,request,id):
         page = get_object_or_404(Page,id = id)
-        return render(request,"wisme/page_confirm_delete.html",{"page":page})
+        words = page.words.all()
+        contents = {
+            "page":page,
+            "words":words
+        }
+        
+        return render(request,"wisme/page_confirm_delete.html",contents)
     
     def post(self,request,id):
         page = get_object_or_404(Page,id = id)

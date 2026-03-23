@@ -1,8 +1,15 @@
 {% extends "base/wisme_base.html" %}
-{% block body %}
 
-    <a href="{% url 'wisme:page_create' %}">利用する</a>
+{% block body %}
+    
+    <nav class = 'nav_index'>
+    
+    <button class = 'btn use'><a href="{% url 'wisme:page_create' %}">利用する</a></button>
+    
     <br>
-    <a href="{% url 'wisme:page_list' %}">コンテンツ一覧</a>
+
+    <button class = 'btn content'><a href="{% url 'wisme:page_list' %}">コンテンツ一覧</a></button>
+
+    </nav>
 
 {% endblock %}

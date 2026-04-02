@@ -19,12 +19,10 @@
  
 
 ## 📸 デモ (Demo / Screenshots)
-![Demo]([画像URLまたはパス])
-※準備中
+
+https://github.com/user-attachments/assets/6afecaf1-349e-469f-9b66-0d0af040c138
 
 
-## 📝 設定 (Configuration)
-.env ファイルに Gemini APIキーを設定してください。
 
 ## 🛠 使い方 (Usage)
 リポジトリをクローンして移動します。
@@ -32,6 +30,8 @@
 ```bash
 git clone [https://github.com/c1417005/app_wisme_development_2.3.git](https://github.com/c1417005/app_wisme_development_2.3.git)
 cd app_wisme_development_2.3
+```
+
 
 ## 📝 設定 (Configuration)
 .env ファイルに Gemini APIキーを設定してください。

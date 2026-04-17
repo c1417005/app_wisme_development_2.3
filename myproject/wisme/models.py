@@ -1,6 +1,11 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 from pathlib import Path
 import uuid
+
+
+class CustomUser(AbstractUser):
+    pass
 
 class Page(models.Model):
     id = models.UUIDField(primary_key=True,

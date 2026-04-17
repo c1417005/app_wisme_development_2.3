@@ -1,3 +1,4 @@
 .env
 .VSCodeCounter
 myproject/db.sqlite3
+.md

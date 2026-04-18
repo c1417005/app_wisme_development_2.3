@@ -1,0 +1,26 @@
+<div class="space-y-3">
+    <div class="flex gap-2">
+        <input type="text" id="{{ panel_id }}-word-input" placeholder="例: novel"
+               class="flex-1 border border-stone-200 rounded-lg px-3 py-2 text-sm bg-[#FAF8F4] outline-none focus:border-stone-400">
+        <button id="{{ panel_id }}-search-btn"
+                class="bg-stone-700 text-white px-3 py-2 rounded-lg text-sm hover:bg-stone-600 transition-colors">
+            調べる
+        </button>
+    </div>
+
+    <!-- スケルトン UI -->
+    <div id="{{ panel_id }}-skeleton" class="hidden space-y-2 animate-pulse">
+        <div class="h-3 bg-stone-200 rounded w-3/4"></div>
+        <div class="h-3 bg-stone-200 rounded w-full"></div>
+        <div class="h-3 bg-stone-200 rounded w-2/3"></div>
+    </div>
+
+    <!-- 自動紐付けインジケーター -->
+    <div id="{{ panel_id }}-indicator" class="hidden items-center gap-1.5 text-xs text-emerald-600">
+        <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
+        このメモに保存されました
+    </div>
+
+    <!-- 検索結果リスト -->
+    <div id="{{ panel_id }}-results" class="space-y-3 max-h-72 overflow-y-auto"></div>
+</div>

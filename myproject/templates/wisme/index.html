@@ -1,20 +1,118 @@
 {% extends "base/wisme_base.html" %}
-{% block head %}
-<head><link rel="stylesheet" href="/static/wisme/css/style.css"></head>
-{% endblock %}
+{% block title %}Wisme — ホーム{% endblock %}
 
 {% block body %}
-    <div class = "sp l"></div>
-    <div class = "sp r"></div>
-    
-    <nav class = 'nav_index'>
-    
-    <button class = 'btn use'><a href="{% url 'wisme:page_create' %}">利用する</a></button>
-    
-    <br>
 
-    <button class = 'btn content'><a href="{% url 'wisme:page_list' %}">コンテンツ一覧</a></button>
+{% if page_count == 0 %}
+<!-- 初回ウェルカム UI -->
+<div class="max-w-xl mx-auto text-center py-16">
+    <p class="text-4xl mb-6">📖</p>
+    <h2 class="text-2xl font-semibold text-stone-800 mb-3">Wisme へようこそ</h2>
+    <p class="text-stone-500 leading-relaxed mb-8">
+        読んでいる本のメモを書きながら、<br>
+        気になった単語をその場で調べて保存できるツールです。<br>
+        あとで自分のメモを読み返すのが、きっと楽しくなります。
+    </p>
+    <a href="{% url 'wisme:page_create' %}"
+       class="inline-flex items-center gap-2 bg-stone-800 text-white px-6 py-3 rounded-lg hover:bg-stone-700 transition-colors font-medium">
+        <i data-lucide="book-plus" class="w-5 h-5"></i>
+        最初のメモを書く
+    </a>
+</div>
 
-    </nav>
+{% else %}
+<!-- 通常ダッシュボード -->
+<div class="space-y-10">
+
+    <!-- 再開ボタン -->
+    {% if latest_page %}
+    <section class="bg-white rounded-2xl shadow-sm border border-stone-100 p-6">
+        <p class="text-xs text-stone-400 uppercase tracking-widest mb-3">いま、何を読んでいますか？</p>
+        <div class="flex items-center gap-4">
+            {% if latest_page.picture %}
+            <img src="{{ latest_page.picture.url }}"
+                 class="w-14 h-20 object-cover rounded-md shadow-sm shrink-0" alt="{{ latest_page.title }}">
+            {% else %}
+            <div class="w-14 h-20 bg-stone-100 rounded-md flex items-center justify-center shrink-0">
+                <i data-lucide="book-open" class="w-6 h-6 text-stone-300"></i>
+            </div>
+            {% endif %}
+            <div class="flex-1 min-w-0">
+                <h2 class="text-lg font-semibold text-stone-800 truncate">{{ latest_page.title }}</h2>
+                <p class="text-sm text-stone-400 mt-0.5">{{ latest_page.page_date }}</p>
+            </div>
+            <a href="{% url 'wisme:page_update' latest_page.id %}"
+               class="shrink-0 inline-flex items-center gap-2 bg-stone-800 text-white px-4 py-2 rounded-lg hover:bg-stone-700 transition-colors text-sm font-medium">
+                <i data-lucide="pencil" class="w-4 h-4"></i>
+                再開する
+            </a>
+        </div>
+    </section>
+    {% endif %}
+
+    <!-- メモ一覧への導線 -->
+    <section class="flex gap-3">
+        <a href="{% url 'wisme:page_list' %}"
+           class="flex-1 flex items-center justify-center gap-2 border border-stone-200 bg-white rounded-xl py-4 text-stone-600 hover:border-stone-400 hover:text-stone-800 transition-colors text-sm font-medium">
+            <i data-lucide="library" class="w-4 h-4"></i>
+            メモ一覧を見る
+        </a>
+        <a href="{% url 'wisme:page_create' %}"
+           class="flex-1 flex items-center justify-center gap-2 border border-stone-200 bg-white rounded-xl py-4 text-stone-600 hover:border-stone-400 hover:text-stone-800 transition-colors text-sm font-medium">
+            <i data-lucide="book-plus" class="w-4 h-4"></i>
+            新しいメモを書く
+        </a>
+    </section>
+
+</div>
+
+<!-- 振り返りポップアップ -->
+<div id="review-popup"
+     class="hidden fixed inset-0 bg-black/20 z-50 flex items-end sm:items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full">
+        <p class="text-base font-medium text-stone-800 mb-2">久しぶりに自分の書いたメモを<br>振り返ってみませんか？</p>
+        <p class="text-sm text-stone-400 mb-5">前回のメモ更新から少し時間が経っています。</p>
+        <div class="flex gap-3">
+            <a href="{% url 'wisme:page_list' %}"
+               class="flex-1 bg-stone-800 text-white text-sm py-2.5 rounded-lg text-center hover:bg-stone-700 transition-colors font-medium">
+                メモを見る
+            </a>
+            <button id="popup-dismiss"
+                    class="flex-1 border border-stone-200 text-stone-500 text-sm py-2.5 rounded-lg hover:bg-stone-50 transition-colors">
+                あとで
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- 振り返りポップアップ制御 JS -->
+<span id="last-updated" data-value="{{ last_updated_at }}"></span>
+<script>
+(function() {
+    const key = 'wisme_review_popup_shown';
+    if (sessionStorage.getItem(key)) return;
+
+    const el = document.getElementById('last-updated');
+    const val = el ? el.dataset.value : '';
+    if (!val) return;
+
+    const lastUpdated = new Date(val);
+    const diffDays = (Date.now() - lastUpdated.getTime()) / (1000 * 60 * 60 * 24);
+    if (diffDays < 7) return;
+
+    sessionStorage.setItem(key, '1');
+    const popup = document.getElementById('review-popup');
+    setTimeout(() => popup.classList.remove('hidden'), 1500);
+
+    document.getElementById('popup-dismiss').addEventListener('click', () => {
+        popup.classList.add('hidden');
+    });
+    popup.addEventListener('click', (e) => {
+        if (e.target === popup) popup.classList.add('hidden');
+    });
+})();
+</script>
+
+{% endif %}
 
 {% endblock %}

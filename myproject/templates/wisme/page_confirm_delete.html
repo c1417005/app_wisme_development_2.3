@@ -1,35 +1,31 @@
 {% extends "base/wisme_base.html" %}
+{% block title %}削除の確認 — Wisme{% endblock %}
+
 {% block body %}
 
-<form method="POST">
-        {% csrf_token %}
-        <p>このコンテンツを削除して良いですか？</p>
-        <button type="submit">削除</button>
-</form>
-<h2>{{page.title}}</h2>
-<div>{{page.page_date}}</div>
-<div>{{page.thoughts | linebreaksbr}}</div>
-{% if page.picture %}
-<img src="{{ page.picture.url }}" />
-{% endif %}
-<hr>
+<div class="max-w-md mx-auto">
+    <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-8 text-center space-y-4">
+        <div class="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto">
+            <i data-lucide="trash-2" class="w-6 h-6 text-red-400"></i>
+        </div>
+        <h1 class="text-lg font-semibold text-stone-800">このメモを削除しますか？</h1>
+        <p class="text-sm text-stone-500 font-medium">「{{ page.title }}」</p>
+        <p class="text-xs text-stone-400">削除すると元に戻せません。紐づいた単語も削除されます。</p>
 
-<table border="1">
-        <thead>
-                <tr>
-                        <th>調べた単語</th>
-                        <th>意味</th>
-                </tr>
-        </thead>
-        <tbody>
-                {% for word in words %}
-                <tr>
-                        <td>{{ word.word }}</td>
-                        <td>{{ word.meaning }}</td>
-                </tr>
-                {% endfor %}
-        </tbody>
-</table>
+        <div class="flex gap-3 pt-2">
+            <a href="{% url 'wisme:page_detail' page.id %}"
+               class="flex-1 border border-stone-200 text-stone-600 py-2.5 rounded-lg text-sm hover:bg-stone-50 transition-colors">
+                キャンセル
+            </a>
+            <form method="POST" class="flex-1">
+                {% csrf_token %}
+                <button type="submit"
+                        class="w-full bg-red-500 text-white py-2.5 rounded-lg text-sm hover:bg-red-600 transition-colors font-medium">
+                    削除する
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
 
-
-{% endblock%}
+{% endblock %}

@@ -2,15 +2,23 @@ from django.shortcuts import render,redirect,get_object_or_404
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import UpdateView
+from django.views.generic import ListView
 from django.urls import reverse_lazy
 from .forms import PageForm, UserProfileForm
 from .models import Page, SearchedWord, CustomUser
 from django.http import JsonResponse
-from .utils.func_api import GeminiAsk
+from .services import WordService
 
 class IndexView(LoginRequiredMixin, View):
-    def get(self,request):
-        return render(request,"wisme/index.html")
+    def get(self, request):
+        pages = Page.objects.filter(owner=request.user)
+        latest = pages.order_by('-update_at').first()
+        ctx = {
+            'page_count': pages.count(),
+            'latest_page': latest,
+            'last_updated_at': latest.update_at.isoformat() if latest else '',
+        }
+        return render(request, "wisme/index.html", ctx)
 
 
 class PageCreateView(LoginRequiredMixin, View):
@@ -68,14 +76,8 @@ class PageUpdateView(LoginRequiredMixin, View):
 class PageSendWordReturnMean(LoginRequiredMixin, View):
     def get(self, request):
         word = request.GET.get('word')
-        result =  GeminiAsk(word)
-        SearchedWord.objects.create(
-            word = word,
-            meaning = result,
-            note = None
-        )
-        data = {'meaning': f"{result}"}
-        return JsonResponse(data)
+        instance = WordService.search_or_fetch(word, user=request.user)
+        return JsonResponse({'meaning': instance.meaning})
 
 
 class PageDeleteView(LoginRequiredMixin, View):
@@ -97,6 +99,30 @@ class PageDeleteView(LoginRequiredMixin, View):
 
         
 
+
+
+class WordListView(LoginRequiredMixin, ListView):
+    model = SearchedWord
+    template_name = 'wisme/word_list.html'
+    context_object_name = 'words'
+
+    def get_queryset(self):
+        qs = SearchedWord.objects.filter(owner=self.request.user).select_related('note')
+        if self.request.GET.get('sort') == 'alpha':
+            return qs.order_by('word')
+        return qs.order_by('-created_at')
+
+
+class FlashcardView(LoginRequiredMixin, ListView):
+    model = SearchedWord
+    template_name = 'wisme/flashcard.html'
+    context_object_name = 'words'
+
+    def get_queryset(self):
+        qs = SearchedWord.objects.filter(owner=self.request.user).select_related('note')
+        if self.request.GET.get('sort') == 'alpha':
+            return qs.order_by('word')
+        return qs.order_by('-created_at')
 
 
 class UserProfileView(LoginRequiredMixin, View):
@@ -121,5 +147,7 @@ page_detail = PageDetailView.as_view()
 page_update = PageUpdateView.as_view()
 page_delete = PageDeleteView.as_view()
 page_return_mean = PageSendWordReturnMean.as_view()
+word_list = WordListView.as_view()
+flashcard = FlashcardView.as_view()
 profile = UserProfileView.as_view()
 profile_update = UserProfileUpdateView.as_view()

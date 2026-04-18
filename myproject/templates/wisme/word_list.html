@@ -1,0 +1,51 @@
+{% extends "base/wisme_base.html" %}
+{% block title %}単語帳 — Wisme{% endblock %}
+
+{% block body %}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-xl font-semibold text-stone-800">単語帳</h1>
+    <div class="flex items-center gap-1 text-xs text-stone-400 bg-white border border-stone-200 rounded-lg overflow-hidden">
+        <a href="?sort=created_at"
+           class="px-3 py-2 hover:bg-stone-50 transition-colors {% if not request.GET.sort or request.GET.sort == 'created_at' %}bg-stone-100 text-stone-700 font-medium{% endif %}">
+            新しい順
+        </a>
+        <span class="text-stone-200">|</span>
+        <a href="?sort=alpha"
+           class="px-3 py-2 hover:bg-stone-50 transition-colors {% if request.GET.sort == 'alpha' %}bg-stone-100 text-stone-700 font-medium{% endif %}">
+            A → Z
+        </a>
+    </div>
+</div>
+
+{% if words %}
+<div class="bg-white rounded-2xl border border-stone-100 shadow-sm divide-y divide-stone-50">
+    {% for word in words %}
+    <div class="px-5 py-4 flex gap-4 items-start hover:bg-stone-50/50 transition-colors">
+        <div class="w-32 shrink-0">
+            <span class="font-medium text-stone-800 text-sm">{{ word.word }}</span>
+        </div>
+        <div class="flex-1 min-w-0">
+            <p class="text-sm text-stone-500 leading-relaxed">{{ word.meaning }}</p>
+            {% if word.note %}
+            <a href="{% url 'wisme:page_detail' word.note.id %}"
+               class="mt-1 inline-flex items-center gap-1 text-xs text-stone-400 hover:text-stone-600 transition-colors">
+                <i data-lucide="book-open" class="w-3 h-3"></i>
+                {{ word.note.title }}
+            </a>
+            {% endif %}
+        </div>
+        <span class="text-xs text-stone-300 shrink-0 pt-0.5">{{ word.created_at|date:"m/d" }}</span>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center py-20 text-stone-400">
+    <i data-lucide="notebook-text" class="w-12 h-12 mx-auto mb-4 opacity-30"></i>
+    <p class="text-sm">まだ単語が登録されていません。</p>
+    <p class="text-xs mt-1">メモ作成中に単語を調べると、ここに保存されます。</p>
+</div>
+{% endif %}
+
+{% endblock %}

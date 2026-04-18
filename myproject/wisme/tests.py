@@ -2,7 +2,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.core import mail
 from allauth.account.models import EmailAddress
-from wisme.models import CustomUser, Page
+from wisme.models import CustomUser, Page, SearchedWord
 import datetime
 
 
@@ -182,3 +182,61 @@ class ProfileOtherUserTest(TestCase):
         self.client.post(reverse('wisme:profile_update'), {'display_name': 'ハッカー', 'profile_image': ''})
         self.user2.refresh_from_db()
         self.assertNotEqual(self.user2.display_name, 'ハッカー')
+
+
+# --- 004 単語帳機能 ---
+
+def make_word(owner, word="apple", meaning="りんご", note=None):
+    return SearchedWord.objects.create(owner=owner, word=word, meaning=meaning, note=note)
+
+
+# DoD: /wisme/words/ に単語一覧が表示される（ログイン必須）
+class WordListAccessTest(TestCase):
+    def setUp(self):
+        self.user = make_verified_user('wl@example.com', 'Testpass123!')
+
+    def test_word_list_accessible_when_logged_in(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('wisme:word_list'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_word_list_redirects_when_not_logged_in(self):
+        response = self.client.get(reverse('wisme:word_list'))
+        self.assertRedirects(response, '/accounts/login/?next=/wisme/words/', fetch_redirect_response=False)
+
+
+# DoD: 他のユーザーの単語が表示されない
+class WordListOwnerFilterTest(TestCase):
+    def setUp(self):
+        self.user1 = make_verified_user('wl1@example.com', 'Testpass123!')
+        self.user2 = make_verified_user('wl2@example.com', 'Testpass123!')
+        make_word(self.user1, word='hello')
+        make_word(self.user2, word='world')
+
+    def test_shows_only_own_words(self):
+        self.client.force_login(self.user1)
+        response = self.client.get(reverse('wisme:word_list'))
+        words = response.context['words']
+        self.assertEqual(words.count(), 1)
+        self.assertEqual(words.first().word, 'hello')
+
+
+# DoD: アルファベット順ソートに切り替えられる
+class WordListSortTest(TestCase):
+    def setUp(self):
+        self.user = make_verified_user('wls@example.com', 'Testpass123!')
+        make_word(self.user, word='zebra')
+        make_word(self.user, word='apple')
+        make_word(self.user, word='mango')
+
+    def test_default_sort_by_created_at_desc(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('wisme:word_list'))
+        words = list(response.context['words'])
+        self.assertEqual(words[0].word, 'mango')
+
+    def test_alpha_sort(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('wisme:word_list') + '?sort=alpha')
+        words = list(response.context['words'])
+        self.assertEqual(words[0].word, 'apple')

@@ -62,14 +62,17 @@ class Page(models.Model):
 
 
 class SearchedWord(models.Model):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="オーナー",
+    )
     note = models.ForeignKey(
-        #1対多（ページと単語）の紐づけをしたいときに設定する。
         Page,
         on_delete=models.CASCADE,
-        #親が削除されると子も削除
         related_name='words',
-        #親から子のデータを取得したいとき（このページにはどんな単語があるか）
-        #に使用するニックネーム。
         null = True,
         blank = True,
         verbose_name = "関連メモ"

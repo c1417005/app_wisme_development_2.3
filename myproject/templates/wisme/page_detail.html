@@ -1,38 +1,59 @@
 {% extends "base/wisme_base.html" %}
+{% block title %}{{ page.title }} — Wisme{% endblock %}
+
 {% block body %}
 
-<h2>{{page.title}}</h2>
-<div>{{page.page_date}}</div>
-<div>{{page.thoughts | linebreaksbr}}</div>
+<div class="max-w-2xl mx-auto space-y-6">
 
-{% if page.picture %}
-<img src="{{ page.picture.url }}"/>
-{% endif %}
+    <!-- ヘッダー -->
+    <div class="flex items-start gap-4">
+        {% if page.picture %}
+        <img src="{{ page.picture.url }}" alt="{{ page.title }}"
+             class="w-20 h-28 object-cover rounded-xl shadow-sm shrink-0">
+        {% endif %}
+        <div class="flex-1 min-w-0">
+            <p class="text-xs text-stone-400 mb-1">{{ page.page_date }}</p>
+            <h1 class="text-2xl font-semibold text-stone-800 leading-tight">{{ page.title }}</h1>
+        </div>
+    </div>
 
-<hr>
+    <!-- 感想 -->
+    {% if page.thoughts %}
+    <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6">
+        <h2 class="text-xs font-medium text-stone-400 uppercase tracking-widest mb-3">メモ・感想</h2>
+        <div class="text-sm text-stone-700 leading-relaxed whitespace-pre-line">{{ page.thoughts }}</div>
+    </div>
+    {% endif %}
 
-<table border="1">
-    <thead>
-        <tr>
-            <th>調べた単語</th>
-            <th>意味</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for word in words %}
-        <tr>
-            <td>{{ word.word }}</td>
-            <td>{{ word.meaning }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    <!-- 調べた単語 -->
+    {% if words %}
+    <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6">
+        <h2 class="text-xs font-medium text-stone-400 uppercase tracking-widest mb-4">調べた単語</h2>
+        <div class="space-y-3">
+            {% for word in words %}
+            <div class="flex gap-3">
+                <span class="shrink-0 font-medium text-stone-800 text-sm w-28 pt-0.5">{{ word.word }}</span>
+                <span class="text-sm text-stone-500 leading-relaxed">{{ word.meaning }}</span>
+            </div>
+            {% if not forloop.last %}<hr class="border-stone-100">{% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
 
-<br>
-<a href="{% url 'wisme:page_update' page.id %}">編集</a>
-<a href="{% url 'wisme:page_delete' page.id %}">削除</a>
+    <!-- アクション -->
+    <div class="flex gap-3">
+        <a href="{% url 'wisme:page_update' page.id %}"
+           class="flex-1 flex items-center justify-center gap-2 bg-stone-800 text-white py-2.5 rounded-lg hover:bg-stone-700 transition-colors text-sm font-medium">
+            <i data-lucide="pencil" class="w-4 h-4"></i>
+            編集する
+        </a>
+        <a href="{% url 'wisme:page_delete' page.id %}"
+           class="flex items-center justify-center gap-1 border border-red-200 text-red-400 px-4 py-2.5 rounded-lg hover:bg-red-50 transition-colors text-sm">
+            <i data-lucide="trash-2" class="w-4 h-4"></i>
+        </a>
+    </div>
 
+</div>
 
-
-
-{% endblock%}
+{% endblock %}

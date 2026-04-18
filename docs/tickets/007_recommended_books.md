@@ -48,19 +48,25 @@ class BookRecommendationService:
 
 ### 2-3. 推薦ビューの追加
 
+推薦図書はダッシュボード（`IndexView`）のコンテキストとして渡し、**専用ページは設けない**。  
+ダッシュボード下部のカルーセル形式で表示する（011 チケット参照）。
+
 ```python
-class BookRecommendationView(LoginRequiredMixin, View):
-    def get(self, request):
-        recommendations = BookRecommendationService.get_recommendations(request.user)
-        return render(request, 'wisme/book_recommendations.html', {
-            'recommendations': recommendations
-        })
+# wisme/views.py
+class IndexView(LoginRequiredMixin, TemplateView):
+    template_name = 'wisme/index.html'
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx['recommendations'] = BookRecommendationService.get_recommendations(self.request.user)
+        return ctx
 ```
 
 ### 2-4. 人気図書の推薦
 
 - 全ユーザーで高評価（rating >= 4）の `Page` タイトルをランキング表示する。
 - 同一タイトルの集計は `Page.objects.values('title').annotate(avg_rating=Avg('rating')).order_by('-avg_rating')` で行う。
+- カルーセルでの表示形式: 縦長（比率 2:3）の表紙画像カード（011 チケットの 2-5 参照）。
 
 ---
 
@@ -71,8 +77,8 @@ class BookRecommendationView(LoginRequiredMixin, View):
 | `wisme/models.py` | `Page` に `rating`, `genre`, `author` フィールドを追加 |
 | `wisme/views.py` | `BookRecommendationView` を追加 |
 | `wisme/services.py` | `BookRecommendationService` を追加 |
-| `wisme/urls.py` | `/wisme/books/recommend/` を追加 |
-| `templates/wisme/` | `book_recommendations.html`, ページ作成/編集フォームへのフィールド追加 |
+| `wisme/urls.py` | 専用 URL は追加しない（ダッシュボードに統合） |
+| `templates/wisme/` | `index.html` にカルーセル追加、ページ作成/編集フォームへのフィールド追加 |
 | `wisme/migrations/` | `Page` フィールド追加のマイグレーション |
 
 ---

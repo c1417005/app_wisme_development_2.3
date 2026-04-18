@@ -1,0 +1,95 @@
+{% extends "base/wisme_base.html" %}
+{% block title %}フラッシュカード — Wisme{% endblock %}
+
+{% block head %}
+<style>
+    .flip { perspective: 1000px; }
+    .flip-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+        transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .flip-inner.is-flipped {
+        transform: rotateY(180deg);
+        -webkit-transform: rotateY(180deg);
+    }
+    .flip-face {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+    }
+    .flip-face-back {
+        transform: rotateY(180deg);
+        -webkit-transform: rotateY(180deg);
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-xl font-semibold text-stone-800">フラッシュカード</h1>
+    <div class="flex items-center gap-1 text-xs text-stone-400 bg-white border border-stone-200 rounded-lg overflow-hidden">
+        <a href="?sort=created_at"
+           class="px-3 py-2 hover:bg-stone-50 transition-colors {% if not request.GET.sort or request.GET.sort == 'created_at' %}bg-stone-100 text-stone-700 font-medium{% endif %}">
+            新しい順
+        </a>
+        <span class="text-stone-200">|</span>
+        <a href="?sort=alpha"
+           class="px-3 py-2 hover:bg-stone-50 transition-colors {% if request.GET.sort == 'alpha' %}bg-stone-100 text-stone-700 font-medium{% endif %}">
+            A → Z
+        </a>
+    </div>
+</div>
+
+<p class="text-xs text-stone-400 mb-6">カードをクリックすると裏返します。</p>
+
+{% if words %}
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+    {% for word in words %}
+    <div class="flip h-40 cursor-pointer select-none" onclick="this.querySelector('.flip-inner').classList.toggle('is-flipped')">
+        <div class="flip-inner">
+
+            <!-- 表: 単語 -->
+            <div class="flip-face bg-white rounded-2xl border border-stone-100 shadow-sm flex flex-col items-center justify-center p-4 text-center">
+                <p class="font-semibold text-stone-800 text-lg leading-tight">{{ word.word }}</p>
+                <p class="text-xs text-stone-300 mt-2 flex items-center gap-1">
+                    <i data-lucide="rotate-cw" class="w-3 h-3"></i>タップして確認
+                </p>
+            </div>
+
+            <!-- 裏: 意味 + 出典 -->
+            <div class="flip-face flip-face-back bg-stone-800 rounded-2xl shadow-sm flex flex-col justify-between p-4">
+                <p class="text-sm text-stone-100 leading-relaxed line-clamp-4">{{ word.meaning }}</p>
+                {% if word.note %}
+                <div class="flex items-center gap-2 mt-2 border-t border-stone-700 pt-2">
+                    {% if word.note.picture %}
+                    <img src="{{ word.note.picture.url }}" alt="{{ word.note.title }}"
+                         class="w-6 h-8 object-cover rounded shrink-0">
+                    {% endif %}
+                    <p class="text-xs text-stone-400 leading-tight line-clamp-2">{{ word.note.title }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% else %}
+<div class="text-center py-20 text-stone-400">
+    <i data-lucide="layers" class="w-12 h-12 mx-auto mb-4 opacity-30"></i>
+    <p class="text-sm">まだ単語が登録されていません。</p>
+    <p class="text-xs mt-1">メモ作成中に単語を調べると、カードが作られます。</p>
+</div>
+{% endif %}
+
+{% endblock %}

@@ -1,15 +1,37 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 from pathlib import Path
+from encrypted_model_fields.fields import EncryptedCharField
 import uuid
 
 
 class CustomUser(AbstractUser):
-    pass
+    display_name = EncryptedCharField(max_length=100, blank=True, verbose_name="表示名")
+    profile_image = models.ImageField(
+        upload_to='media/profile/', blank=True, null=True, verbose_name="プロフィール画像"
+    )
+
+    def save(self, *args, **kwargs):
+        try:
+            old = CustomUser.objects.get(pk=self.pk)
+            if old.profile_image and old.profile_image != self.profile_image:
+                Path(old.profile_image.path).unlink(missing_ok=True)
+        except CustomUser.DoesNotExist:
+            pass
+        super().save(*args, **kwargs)
 
 class Page(models.Model):
     id = models.UUIDField(primary_key=True,
                           default = uuid.uuid4,editable=False,verbose_name="Id")
+
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="オーナー",
+    )
     
     title = models.CharField(max_length=100,verbose_name="タイトル")
 

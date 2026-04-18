@@ -1,0 +1,25 @@
+{% extends "base/wisme_base.html" %}
+{% block body %}
+
+<h2>プロフィール</h2>
+
+<div class="profile-container">
+    {% if user.profile_image %}
+        <img src="{{ user.profile_image.url }}" alt="プロフィール画像" style="max-width:150px; max-height:150px;">
+    {% else %}
+        <p>画像未設定</p>
+    {% endif %}
+
+    <dl>
+        <dt>ユーザー名</dt>
+        <dd>{{ user.username }}</dd>
+        <dt>表示名</dt>
+        <dd>{{ user.display_name|default:"未設定" }}</dd>
+        <dt>メールアドレス</dt>
+        <dd>{{ user.email }}</dd>
+    </dl>
+
+    <a href="{% url 'wisme:profile_update' %}">プロフィールを編集</a>
+</div>
+
+{% endblock %}

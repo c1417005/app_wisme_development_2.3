@@ -7,7 +7,18 @@
     {% endblock %}
 </head>
 <body class = 'container'>
-    <h1><a href="{% url 'wisme:index' %}">Wisme</a></h1>
+    <header>
+        <h1><a href="{% url 'wisme:index' %}">Wisme</a></h1>
+        <nav>
+            {% if user.is_authenticated %}
+                <span>{{ user.email }}</span>
+                <a href="{% url 'account_logout' %}">ログアウト</a>
+            {% else %}
+                <a href="{% url 'account_login' %}">ログイン</a>
+                <a href="{% url 'account_signup' %}">新規登録</a>
+            {% endif %}
+        </nav>
+    </header>
     {% block body %}
     {% endblock %}
     

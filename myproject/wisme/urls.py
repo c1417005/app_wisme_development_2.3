@@ -11,4 +11,6 @@ urlpatterns = [
     path("page/<uuid:id>/update/",views.page_update,name = "page_update"),
     path("page/<uuid:id>/delete/",views.page_delete,name = "page_delete"),
     path("search/mean/",views.page_return_mean,name = "page_return_mean"),
+    path("profile/", views.profile, name="profile"),
+    path("profile/update/", views.profile_update, name="profile_update"),
 ]

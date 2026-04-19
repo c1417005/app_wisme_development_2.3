@@ -1,6 +1,6 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, inlineformset_factory
 from django import forms
-from .models import Page, CustomUser
+from .models import Page, Chapter, CustomUser
 
 
 class UserProfileForm(ModelForm):
@@ -14,7 +14,27 @@ class PageForm(ModelForm):
         label = "調べたい単語",
         widget = forms.TextInput(attrs={"id":"id_input_word"}),
         required = False)
-    
+
     class Meta:
         model = Page
         fields = ["title","thoughts","page_date","picture"]
+
+
+class ChapterForm(ModelForm):
+    class Meta:
+        model = Chapter
+        fields = ['title', 'content', 'order']
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': '章タイトル（任意）'}),
+            'content': forms.Textarea(attrs={'placeholder': 'この章の内容', 'rows': 6}),
+            'order': forms.HiddenInput(),
+        }
+
+
+ChapterFormSet = inlineformset_factory(
+    Page,
+    Chapter,
+    form=ChapterForm,
+    extra=1,
+    can_delete=True,
+)

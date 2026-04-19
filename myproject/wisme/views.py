@@ -4,7 +4,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import UpdateView
 from django.views.generic import ListView
 from django.urls import reverse_lazy
-from .forms import PageForm, UserProfileForm
+from .forms import PageForm, UserProfileForm, ChapterFormSet
 from .models import Page, SearchedWord, CustomUser
 from django.http import JsonResponse
 from .services import WordService
@@ -24,17 +24,26 @@ class IndexView(LoginRequiredMixin, View):
 class PageCreateView(LoginRequiredMixin, View):
     def get(self,request):
         form = PageForm()
-        return render(request,"wisme/page_form.html",{"form":form})
+        chapter_formset = ChapterFormSet()
+        return render(request,"wisme/page_form.html",{"form":form,"chapter_formset":chapter_formset})
 
     def post(self,request):
         form = PageForm(request.POST,request.FILES)
-        if form.is_valid():
+        chapter_formset = ChapterFormSet(request.POST)
+        if form.is_valid() and chapter_formset.is_valid():
             new_page = form.save(commit=False)
             new_page.owner = request.user
             new_page.save()
+            chapter_formset.instance = new_page
+            chapters = chapter_formset.save(commit=False)
+            for idx, chapter in enumerate(chapters):
+                chapter.order = idx
+                chapter.save()
+            for obj in chapter_formset.deleted_objects:
+                obj.delete()
             SearchedWord.objects.filter(note__isnull = True).update(note = new_page)
             return redirect("wisme:index")
-        return render(request,"wisme/page_form.html",{"form":form})
+        return render(request,"wisme/page_form.html",{"form":form,"chapter_formset":chapter_formset})
 
 class PageListView(LoginRequiredMixin, View):
     def get(self,request):
@@ -46,9 +55,11 @@ class PageDetailView(LoginRequiredMixin, View):
     def get(self,request,id):
         page = get_object_or_404(Page, id=id, owner=request.user)
         words = page.words.all()
+        chapters = page.chapters.all()
         contents = {
             "page":page,
-            "words":words
+            "words":words,
+            "chapters":chapters,
         }
         return render(request,"wisme/page_detail.html",contents)
 
@@ -56,21 +67,31 @@ class PageUpdateView(LoginRequiredMixin, View):
     def get(self,request,id):
         page = get_object_or_404(Page, id=id, owner=request.user)
         form = PageForm(instance = page)
+        chapter_formset = ChapterFormSet(instance=page)
         words = page.words.all()
         contents = {
             "form":form,
-            "words":words
+            "chapter_formset":chapter_formset,
+            "words":words,
         }
         return render(request,"wisme/page_update.html",contents)
 
     def post(self,request,id):
         page = get_object_or_404(Page, id=id, owner=request.user)
         form = PageForm(request.POST,request.FILES,instance=page)
-        if form.is_valid():
+        chapter_formset = ChapterFormSet(request.POST,instance=page)
+        if form.is_valid() and chapter_formset.is_valid():
             form.save()
+            chapters = chapter_formset.save(commit=False)
+            for idx, chapter in enumerate(chapters):
+                chapter.order = idx
+                chapter.save()
+            for obj in chapter_formset.deleted_objects:
+                obj.delete()
             SearchedWord.objects.filter(note__isnull = True).update(note = page)
             return redirect("wisme:page_detail",id = id)
-        return render(request,"wisme/page_form.html",{"form":form})
+        words = page.words.all()
+        return render(request,"wisme/page_update.html",{"form":form,"chapter_formset":chapter_formset,"words":words})
 
 
 class PageSendWordReturnMean(LoginRequiredMixin, View):

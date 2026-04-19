@@ -61,6 +61,26 @@ class Page(models.Model):
             Path(picture.path).unlink(missing_ok=True)
 
 
+class Chapter(models.Model):
+    page = models.ForeignKey(
+        Page,
+        on_delete=models.CASCADE,
+        related_name='chapters',
+        verbose_name='所属メモ',
+    )
+    order = models.PositiveIntegerField(default=0, verbose_name='並び順')
+    title = models.CharField(max_length=100, blank=True, verbose_name='章タイトル')
+    content = models.TextField(blank=True, verbose_name='章の内容')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='作成日時')
+    update_at = models.DateTimeField(auto_now=True, verbose_name='更新日時')
+
+    class Meta:
+        ordering = ['order', 'created_at']
+
+    def __str__(self):
+        return self.title or f'第{self.order + 1}章'
+
+
 class SearchedWord(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,

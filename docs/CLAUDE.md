@@ -48,13 +48,14 @@ DEBUG=True
 ### データモデル (`wisme/models.py`)
 
 - **CustomUser** — `AbstractUser` を継承したカスタムユーザーモデル。将来の拡張（プロフィール画像・暗号化フィールド等）に対応するため、プロジェクト初期から導入する。`AUTH_USER_MODEL = 'wisme.CustomUser'` を `settings.py` に設定。
-- **Page** — 読書メモ。UUID PK、タイトル、感想、日付、任意の画像を持つ。`delete()` をオーバーライドし、削除時に画像ファイルをディスクから削除。
+- **Page** — 読書メモ。UUID PK、タイトル、**本全体の感想（`thoughts`）**、日付、任意の画像を持つ。`delete()` をオーバーライドし、削除時に画像ファイルをディスクから削除。
+- **Chapter** — 読書メモの章単位コンテンツ。`Page` への FK（`related_name='chapters'`、CASCADE）、`order`（並び順）、`title`、`content` を持つ。「本全体の感想」とは明確に分離された「章ごとのメモ」を格納する。詳細はチケット 012。
 - **SearchedWord** — 単語と意味のペア。`Page` への nullable FK を持つ。単語検索時に即座に作成され（フォーム送信前）、Page 保存時に紐づけられる。`word` フィールドには一意インデックスを設定し、DB キャッシュとして機能させる。
 
 ### リクエストフロー
 
 1. ユーザーがフォームで単語入力 → JS が `wisme/search/mean/` へ AJAX POST → `PageSendWordReturnMean` ビューが `WordService.search_or_fetch()` を呼ぶ → DB にヒットすれば API 呼び出しをスキップ、なければ `GeminiAsk()` → `SearchedWord`（`note=None`）として保存 → 意味をレスポンス返却。
-2. ユーザーが Page フォームを送信 → `PageCreateView`/`PageUpdateView` が Page を保存 → `note=None` の `SearchedWord` を全件取得して新規 Page に紐づける。
+2. ユーザーが Page フォームを送信 → `PageCreateView`/`PageUpdateView` が Page と `ChapterFormSet`（章の inline formset）を検証・保存 → `note=None` の `SearchedWord` を全件取得して新規 Page に紐づける。
 
 > ビジネスロジック（API呼び出し・単語の重複チェック・紐づけ処理）は View に書かず、`wisme/services.py` の Service 層に集約する（**Thin View / Fat Service** 原則）。
 
@@ -182,6 +183,7 @@ DEBUG=True
 | 009 | セキュリティ強化 | 未着手 | 未作成 |
 | 010 | PythonAnywhere デプロイ | 未着手 | 未作成 |
 | 011 | UI/UX 実装（デザインシステム・全画面フロントエンド） | 未着手 | 未作成 |
+| 012 | 章単位メモ機能（Chapter モデル・動的フォーム） | 完了 | 完了（6件） |
 
 > チケットの DoD チェックボックスは **自動テスト（`python manage.py test`）が通過した項目のみ** `[x]` とする。
 

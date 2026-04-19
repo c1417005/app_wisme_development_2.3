@@ -15,30 +15,115 @@
 
     <!-- 左: メインフォーム -->
     <form method="POST" enctype="multipart/form-data" id="page-form"
-          class="bg-white rounded-2xl shadow-sm border border-stone-100 p-6 space-y-5">
+          class="space-y-5">
         {% csrf_token %}
 
-        {% for field in form %}
-        {% if field.name != 'input_word' %}
-        <div class="space-y-1">
-            <label class="block text-sm font-medium text-stone-600">{{ field.label }}</label>
-            <div class="[&_input]:w-full [&_input]:border [&_input]:border-stone-200 [&_input]:rounded-lg [&_input]:px-3 [&_input]:py-2 [&_input]:text-sm [&_input]:bg-[#FAF8F4] [&_input]:outline-none [&_input]:transition-colors [&_input]:focus:border-accent-500 [&_input]:focus:ring-2 [&_input]:focus:ring-accent-100
-                        [&_textarea]:w-full [&_textarea]:border [&_textarea]:border-stone-200 [&_textarea]:rounded-lg [&_textarea]:px-3 [&_textarea]:py-2 [&_textarea]:text-sm [&_textarea]:bg-[#FAF8F4] [&_textarea]:outline-none [&_textarea]:transition-colors [&_textarea]:focus:border-accent-500 [&_textarea]:focus:ring-2 [&_textarea]:focus:ring-accent-100 [&_textarea]:resize-none [&_textarea]:h-48
-                        [&_input[type=file]]:border-0 [&_input[type=file]]:p-0 [&_input[type=file]]:bg-transparent [&_input[type=file]]:ring-0 [&_input[type=file]]:focus:ring-0">
-                {{ field }}
+        <!-- 本の情報セクション -->
+        <div class="bg-white rounded-2xl shadow-sm border border-stone-100 p-6 space-y-5">
+            <h2 class="text-xs font-medium text-accent-600 uppercase tracking-widest">本の情報</h2>
+            {% for field in form %}
+            {% if field.name != 'input_word' and field.name != 'thoughts' %}
+            <div class="space-y-1">
+                <label class="block text-sm font-medium text-stone-600">{{ field.label }}</label>
+                <div class="[&_input]:w-full [&_input]:border [&_input]:border-stone-200 [&_input]:rounded-lg [&_input]:px-3 [&_input]:py-2 [&_input]:text-sm [&_input]:bg-[#FAF8F4] [&_input]:outline-none [&_input]:transition-colors [&_input]:focus:border-accent-500 [&_input]:focus:ring-2 [&_input]:focus:ring-accent-100
+                            [&_input[type=file]]:border-0 [&_input[type=file]]:p-0 [&_input[type=file]]:bg-transparent [&_input[type=file]]:ring-0 [&_input[type=file]]:focus:ring-0">
+                    {{ field }}
+                </div>
+                {% if field.errors %}
+                <ul class="text-xs text-red-500 space-y-0.5">
+                    {% for e in field.errors %}<li>{{ e }}</li>{% endfor %}
+                </ul>
+                {% endif %}
             </div>
-            {% if field.errors %}
-            <ul class="text-xs text-red-500 space-y-0.5">
-                {% for e in field.errors %}<li>{{ e }}</li>{% endfor %}
+            {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- 本全体の感想セクション (thoughts) -->
+        <div class="relative bg-accent-50/40 rounded-2xl border border-accent-100 p-6 overflow-hidden">
+            <span class="absolute left-0 top-6 bottom-6 w-1 rounded-r bg-accent-500/70" aria-hidden="true"></span>
+            <h2 class="text-xs font-medium text-accent-700 uppercase tracking-widest mb-1">本全体の感想</h2>
+            <p class="text-xs text-stone-400 mb-3">この本を通して思ったこと、全体を振り返る文章。</p>
+            <div class="[&_textarea]:w-full [&_textarea]:border [&_textarea]:border-stone-200 [&_textarea]:rounded-lg [&_textarea]:px-3 [&_textarea]:py-2 [&_textarea]:text-sm [&_textarea]:bg-white [&_textarea]:outline-none [&_textarea]:transition-colors [&_textarea]:focus:border-accent-500 [&_textarea]:focus:ring-2 [&_textarea]:focus:ring-accent-100 [&_textarea]:resize-none [&_textarea]:h-40">
+                {{ form.thoughts }}
+            </div>
+            {% if form.thoughts.errors %}
+            <ul class="text-xs text-red-500 space-y-0.5 mt-1">
+                {% for e in form.thoughts.errors %}<li>{{ e }}</li>{% endfor %}
             </ul>
             {% endif %}
         </div>
-        {% endif %}
-        {% endfor %}
+
+        <!-- 章ごとのメモセクション (chapters) -->
+        <div class="bg-white rounded-2xl shadow-sm border border-stone-100 p-6">
+            <div class="flex items-center justify-between mb-1">
+                <h2 class="text-xs font-medium text-stone-500 uppercase tracking-widest">章ごとのメモ</h2>
+                <span class="text-xs text-stone-400">任意</span>
+            </div>
+            <p class="text-xs text-stone-400 mb-4">ブログ記事を書くように、章単位で書き残せます。</p>
+
+            {{ chapter_formset.management_form }}
+
+            <div id="chapter-list" class="space-y-4">
+                {% for chapter_form in chapter_formset %}
+                <div class="chapter-item relative bg-stone-50 rounded-xl border border-stone-100 p-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-medium text-accent-700 bg-accent-50 px-2 py-0.5 rounded-full">
+                            <i data-lucide="bookmark" class="w-3 h-3"></i>
+                            <span class="chapter-number">第{{ forloop.counter }}章</span>
+                        </span>
+                        <button type="button" class="chapter-remove text-stone-300 hover:text-red-400 transition-colors" title="この章を削除">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    {% for hidden in chapter_form.hidden_fields %}{{ hidden }}{% endfor %}
+                    <div class="[&_input]:w-full [&_input]:border [&_input]:border-stone-200 [&_input]:rounded-lg [&_input]:px-3 [&_input]:py-2 [&_input]:text-sm [&_input]:bg-white [&_input]:outline-none [&_input]:focus:border-accent-500 [&_input]:focus:ring-2 [&_input]:focus:ring-accent-100
+                                [&_textarea]:w-full [&_textarea]:border [&_textarea]:border-stone-200 [&_textarea]:rounded-lg [&_textarea]:px-3 [&_textarea]:py-2 [&_textarea]:text-sm [&_textarea]:bg-white [&_textarea]:outline-none [&_textarea]:focus:border-accent-500 [&_textarea]:focus:ring-2 [&_textarea]:focus:ring-accent-100 [&_textarea]:resize-none">
+                        {{ chapter_form.title }}
+                        {{ chapter_form.content }}
+                    </div>
+                    {% if chapter_form.non_field_errors %}
+                    <ul class="text-xs text-red-500">{% for e in chapter_form.non_field_errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                    {% endif %}
+                    {% if chapter_form.DELETE %}
+                    <label class="hidden">{{ chapter_form.DELETE }}</label>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- empty_form テンプレート (JSで複製) -->
+            <template id="chapter-empty-template">
+                <div class="chapter-item relative bg-stone-50 rounded-xl border border-stone-100 p-4 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <span class="inline-flex items-center gap-1.5 text-xs font-medium text-accent-700 bg-accent-50 px-2 py-0.5 rounded-full">
+                            <i data-lucide="bookmark" class="w-3 h-3"></i>
+                            <span class="chapter-number">第○章</span>
+                        </span>
+                        <button type="button" class="chapter-remove text-stone-300 hover:text-red-400 transition-colors" title="この章を削除">
+                            <i data-lucide="x" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                    {% for hidden in chapter_formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+                    <div class="[&_input]:w-full [&_input]:border [&_input]:border-stone-200 [&_input]:rounded-lg [&_input]:px-3 [&_input]:py-2 [&_input]:text-sm [&_input]:bg-white [&_input]:outline-none [&_input]:focus:border-accent-500 [&_input]:focus:ring-2 [&_input]:focus:ring-accent-100
+                                [&_textarea]:w-full [&_textarea]:border [&_textarea]:border-stone-200 [&_textarea]:rounded-lg [&_textarea]:px-3 [&_textarea]:py-2 [&_textarea]:text-sm [&_textarea]:bg-white [&_textarea]:outline-none [&_textarea]:focus:border-accent-500 [&_textarea]:focus:ring-2 [&_textarea]:focus:ring-accent-100 [&_textarea]:resize-none">
+                        {{ chapter_formset.empty_form.title }}
+                        {{ chapter_formset.empty_form.content }}
+                    </div>
+                    <label class="hidden">{{ chapter_formset.empty_form.DELETE }}</label>
+                </div>
+            </template>
+
+            <button type="button" id="add-chapter-btn"
+                    class="mt-4 w-full inline-flex items-center justify-center gap-2 border border-dashed border-stone-300 text-stone-500 py-2.5 rounded-lg hover:border-accent-400 hover:text-accent-700 hover:bg-accent-50/30 transition-colors text-sm font-medium">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                章を追加
+            </button>
+        </div>
 
         <!-- 登録済み単語プレビュー -->
         {% if words %}
-        <div class="border-t border-stone-100 pt-4">
+        <div class="bg-white rounded-2xl shadow-sm border border-stone-100 p-6">
             <p class="text-xs font-medium text-stone-500 mb-2">このメモで調べた単語</p>
             <div class="flex flex-wrap gap-2">
                 {% for word in words %}
@@ -97,6 +182,7 @@
 
 {% block scripts %}
 <script src="/static/wisme/js/search.js"></script>
+<script src="/static/wisme/js/chapter_formset.js"></script>
 <script>
 const toggle = document.getElementById('mobile-search-toggle');
 const panel  = document.getElementById('mobile-search-panel');

@@ -60,24 +60,19 @@
 
 ### 2-3. 動的エディタ（メモ作成・編集画面）
 
-**対象テンプレート:** `templates/wisme/page_create.html`, `page_update.html`
+**対象テンプレート:** `templates/wisme/page_form.html`, `page_update.html`
 
 #### 章（Chapter）エディタ
-- Vue.js を使い、「章の追加」ボタンでページ遷移なしに入力欄を増やせるようにする。
-- データ構造:
+- バックエンド側のデータモデル・formset・ビュー拡張は **チケット 012（章単位メモ機能）** で定義。本チケットでは UI 面のみを担当する。
+- 実装は **Django `inlineformset_factory` + バニラ JS** で行う（Vue.js は導入しない）。
+- 「章を追加」ボタン押下で、formset の `empty_form` を複製して DOM に挿入し、`TOTAL_FORMS` をインクリメントする。ページ遷移は発生させない。
+- フォーム送信は通常の Django formset として POST される（hidden JSON input は不要）。
 
-```javascript
-// Vue data
-{
-  chapters: [
-    { title: '第1章', body: '' },
-  ],
-  overall_impression: ''
-}
-```
-
-- フォーム送信時に `chapters` を JSON 文字列として hidden input に格納し、Django の `POST` へ送る。
-- 本全体の感想文入力欄と章ごとの入力欄を、視覚的に明確に分離する（線・背景色で区別）。
+#### 感想と章の視覚分離
+- 「本全体の感想」（`Page.thoughts`）と「章ごと」（`Chapter`）のセクションを視覚的に明確に分離する：
+  - 感想セクション: アクセント色の左ボーダー or 薄背景 + 見出し「本全体の感想」。
+  - 章セクション: 白カード + 章番号バッジ。章間にセパレータ。
+- 要件書 `requirements/UI_requirements.md` セクション B「本全体の感想文入力欄と、章ごとの入力欄を明確に分ける」に対応。
 
 #### 自動紐付けの視覚化
 - 単語検索が完了し自動紐付けが成功した際、検索結果エリアに控えめなインジケーター（例: 緑のチェックアイコン + 「このメモに保存されました」テキスト）を 3 秒表示する。
@@ -169,8 +164,9 @@ const app = Vue.createApp({
 | `templates/base/wisme_base.html` | Tailwind・Vue.js・Lucide を読み込み、ナビゲーションを更新 |
 | `templates/wisme/index.html` | ダッシュボード全面刷新（再開ボタン・振り返りポップアップ・カルーセル） |
 | `templates/wisme/page_list.html` | 表紙画像優先のカードレイアウトに変更 |
-| `templates/wisme/page_create.html` | Vue.js 動的章エディタ、自動紐付けインジケーター、サイドバー |
+| `templates/wisme/page_form.html` | 感想/章セクションの視覚分離、章 formset の動的追加 UI（012 連携）、自動紐付けインジケーター、サイドバー |
 | `templates/wisme/page_update.html` | 同上 |
+| `static/wisme/js/chapter_formset.js` | 「章を追加」のバニラ JS（012 連携） |
 | `static/wisme/css/style.css` | フリップカード CSS、トースト CSS、スケルトン CSS を追加 |
 | `wisme/views.py` | `IndexView` に `last_page_updated_at` コンテキストを追加 |
 
@@ -185,9 +181,9 @@ const app = Vue.createApp({
 - [ ] ポップアップクリックでメモ一覧へ遷移する（クイズ画面ではない）
 - [ ] 同一セッション内でポップアップが2回表示されない
 
-### 動的エディタ
+### 動的エディタ（UI 面のみ。データ保存側は 012 チケット）
 - [ ] 「章を追加」ボタンで入力欄が増える（ページ遷移なし）
-- [ ] 全章データと感想文が POST で送信され Django 側で受け取れる
+- [ ] 「本全体の感想」と「章ごと」が視覚的に明確に分離されて表示される
 - [ ] 自動紐付け成功時にインジケーターが3秒表示される
 
 ### デザイン・レスポンシブ

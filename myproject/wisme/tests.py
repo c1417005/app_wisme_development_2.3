@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.core import mail
 from allauth.account.models import EmailAddress
 from wisme.models import CustomUser, Page, Chapter, SearchedWord
+from unittest.mock import patch
 import datetime
 
 
@@ -361,6 +362,126 @@ class PageUpdateWithChaptersTest(TestCase):
         self.assertIn('更新1章', titles)
         self.assertIn('新3章', titles)
         self.assertNotIn('旧2章', titles)
+
+
+# --- 005 クイズ機能（フラッシュカード） ---
+
+# DoD: /wisme/quiz/ にフラッシュカードが表示される（ログイン必須）
+class FlashcardAccessTest(TestCase):
+    def setUp(self):
+        self.user = make_verified_user('fc@example.com', 'Testpass123!')
+
+    def test_flashcard_accessible_when_logged_in(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('wisme:flashcard'))
+        self.assertEqual(response.status_code, 200)
+
+    def test_flashcard_redirects_when_not_logged_in(self):
+        response = self.client.get(reverse('wisme:flashcard'))
+        self.assertRedirects(response, '/accounts/login/?next=/wisme/quiz/', fetch_redirect_response=False)
+
+
+# DoD: 他ユーザーの単語が表示されない（自分の単語のみ）
+class FlashcardOwnerFilterTest(TestCase):
+    def setUp(self):
+        self.user1 = make_verified_user('fc1@example.com', 'Testpass123!')
+        self.user2 = make_verified_user('fc2@example.com', 'Testpass123!')
+        make_word(self.user1, word='hello')
+        make_word(self.user2, word='world')
+
+    def test_shows_only_own_words(self):
+        self.client.force_login(self.user1)
+        response = self.client.get(reverse('wisme:flashcard'))
+        words = response.context['words']
+        self.assertEqual(words.count(), 1)
+        self.assertEqual(words.first().word, 'hello')
+
+
+# DoD: アルファベット順 / 登録順のソートが切り替えられる
+class FlashcardSortTest(TestCase):
+    def setUp(self):
+        self.user = make_verified_user('fcs@example.com', 'Testpass123!')
+        make_word(self.user, word='zebra')
+        make_word(self.user, word='apple')
+        make_word(self.user, word='mango')
+
+    def test_default_sort_by_created_at_desc(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('wisme:flashcard'))
+        words = list(response.context['words'])
+        self.assertEqual(words[0].word, 'mango')
+
+    def test_alpha_sort(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('wisme:flashcard') + '?sort=alpha')
+        words = list(response.context['words'])
+        self.assertEqual(words[0].word, 'apple')
+
+
+# DoD: 単語が0件の場合、わかりやすいメッセージが表示される
+class FlashcardEmptyTest(TestCase):
+    def setUp(self):
+        self.user = make_verified_user('fce@example.com', 'Testpass123!')
+
+    def test_empty_words_shows_message(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('wisme:flashcard'))
+        self.assertEqual(response.context['words'].count(), 0)
+        self.assertContains(response, 'まだ単語が登録されていません')
+
+
+# --- 006 単語検索UX改善 ---
+
+# パフォーマンス確認: SearchedWord.word に db_index=True が設定されている
+class WordFieldIndexTest(TestCase):
+    def test_word_field_has_db_index(self):
+        field = SearchedWord._meta.get_field('word')
+        self.assertTrue(field.db_index)
+
+    def test_word_field_is_not_unique(self):
+        # unique=True はマルチユーザー設計と相容れないため db_index=True のみ
+        field = SearchedWord._meta.get_field('word')
+        self.assertFalse(field.unique)
+
+
+# DoD: 検索エンドポイントはログイン必須
+class WordSearchAPIAuthTest(TestCase):
+    def test_search_api_requires_login(self):
+        response = self.client.get(reverse('wisme:page_return_mean') + '?word=apple')
+        self.assertRedirects(response, '/accounts/login/?next=/wisme/search/mean/%3Fword%3Dapple',
+                             fetch_redirect_response=False)
+
+
+# DoD: 2回目以降の同じ単語検索はDBから即返る（GeminiAPIを呼ばない）
+class WordSearchCacheTest(TestCase):
+    def setUp(self):
+        self.user = make_verified_user('cache@example.com', 'Testpass123!')
+        self.client.force_login(self.user)
+
+    @patch('wisme.services.GeminiAsk', return_value='テスト用の意味')
+    def test_first_search_calls_api(self, mock_api):
+        self.client.get(reverse('wisme:page_return_mean') + '?word=novel')
+        mock_api.assert_called_once_with('novel')
+
+    @patch('wisme.services.GeminiAsk', return_value='テスト用の意味')
+    def test_second_search_uses_db_cache(self, mock_api):
+        # 1回目: API呼び出し
+        self.client.get(reverse('wisme:page_return_mean') + '?word=novel')
+        mock_api.reset_mock()
+        # 2回目: DBキャッシュから取得（APIは呼ばれない）
+        response = self.client.get(reverse('wisme:page_return_mean') + '?word=novel')
+        mock_api.assert_not_called()
+        self.assertEqual(response.status_code, 200)
+
+    @patch('wisme.services.GeminiAsk', return_value='りんご')
+    def test_api_returns_json_with_meaning_key(self, mock_api):
+        import json
+        response = self.client.get(reverse('wisme:page_return_mean') + '?word=apple')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        data = json.loads(response.content)
+        self.assertIn('meaning', data)
+        self.assertEqual(data['meaning'], 'りんご')
 
 
 # DoD: page_detail で chapters コンテキストが提供される

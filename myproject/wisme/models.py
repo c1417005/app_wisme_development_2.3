@@ -97,7 +97,7 @@ class SearchedWord(models.Model):
         blank = True,
         verbose_name = "関連メモ"
     )
-    word = models.CharField(max_length=100,verbose_name="意味を知りたい単語")
+    word = models.CharField(max_length=100, db_index=True, verbose_name="意味を知りたい単語")
     meaning = models.TextField(verbose_name="意味")
     created_at = models.DateTimeField(auto_now_add = True,verbose_name="検索日時")
 

@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from .forms import PageForm, UserProfileForm, ChapterFormSet
 from .models import Page, SearchedWord, CustomUser
 from django.http import JsonResponse
-from .services import WordService
+from .services import WordService, BookThumbnailService
 
 class IndexView(LoginRequiredMixin, View):
     def get(self, request):
@@ -94,6 +94,16 @@ class PageUpdateView(LoginRequiredMixin, View):
         return render(request,"wisme/page_update.html",{"form":form,"chapter_formset":chapter_formset,"words":words})
 
 
+class BookThumbnailSearchView(LoginRequiredMixin, View):
+    def get(self, request):
+        title = request.GET.get('title', '').strip()
+        author = request.GET.get('author', '').strip()
+        if not title:
+            return JsonResponse({'results': []})
+        results = BookThumbnailService.search(title, author)
+        return JsonResponse({'results': results})
+
+
 class PageSendWordReturnMean(LoginRequiredMixin, View):
     def get(self, request):
         word = request.GET.get('word')
@@ -172,3 +182,4 @@ word_list = WordListView.as_view()
 flashcard = FlashcardView.as_view()
 profile = UserProfileView.as_view()
 profile_update = UserProfileUpdateView.as_view()
+book_thumbnail_search = BookThumbnailSearchView.as_view()

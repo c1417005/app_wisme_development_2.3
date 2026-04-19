@@ -17,11 +17,10 @@
         <div class="bg-white rounded-2xl shadow-sm border border-stone-100 p-6 space-y-5">
             <h2 class="text-xs font-medium text-accent-600 uppercase tracking-widest">本の情報</h2>
             {% for field in form %}
-            {% if field.name != 'input_word' and field.name != 'thoughts' %}
+            {% if field.name != 'input_word' and field.name != 'thoughts' and field.name != 'picture' and field.name != 'image_url' %}
             <div class="space-y-1">
                 <label class="block text-sm font-medium text-stone-600">{{ field.label }}</label>
-                <div class="[&_input]:w-full [&_input]:border [&_input]:border-stone-200 [&_input]:rounded-lg [&_input]:px-3 [&_input]:py-2 [&_input]:text-sm [&_input]:bg-[#FAF8F4] [&_input]:outline-none [&_input]:transition-colors [&_input]:focus:border-accent-500 [&_input]:focus:ring-2 [&_input]:focus:ring-accent-100
-                            [&_input[type=file]]:border-0 [&_input[type=file]]:p-0 [&_input[type=file]]:bg-transparent [&_input[type=file]]:ring-0 [&_input[type=file]]:focus:ring-0">
+                <div class="[&_input]:w-full [&_input]:border [&_input]:border-stone-200 [&_input]:rounded-lg [&_input]:px-3 [&_input]:py-2 [&_input]:text-sm [&_input]:bg-[#FAF8F4] [&_input]:outline-none [&_input]:transition-colors [&_input]:focus:border-accent-500 [&_input]:focus:ring-2 [&_input]:focus:ring-accent-100">
                     {{ field }}
                 </div>
                 {% if field.errors %}
@@ -32,6 +31,64 @@
             </div>
             {% endif %}
             {% endfor %}
+
+            <!-- 表紙画像 -->
+            <div class="space-y-3">
+                <label class="block text-sm font-medium text-stone-600">表紙画像</label>
+
+                <!-- API取得プレビュー -->
+                <div id="thumbnail-preview" class="hidden">
+                    <div class="relative inline-flex flex-col items-start gap-1">
+                        <img id="thumbnail-preview-img" src="" alt="選択した表紙"
+                             class="w-20 h-28 object-cover rounded-lg shadow-sm border border-stone-100">
+                        <button type="button" id="thumbnail-clear-btn"
+                                class="absolute -top-1.5 -right-1.5 bg-red-400 text-white rounded-full w-5 h-5 flex items-center justify-center hover:bg-red-500 transition-colors">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    </div>
+                    <p class="text-xs text-stone-400 mt-1">APIから取得した表紙画像</p>
+                </div>
+
+                <!-- ファイルアップロード -->
+                <div class="space-y-1">
+                    <p class="text-xs text-stone-400">ファイルをアップロード（任意）</p>
+                    <div class="[&_input[type=file]]:text-sm [&_input[type=file]]:text-stone-500">
+                        {{ form.picture }}
+                    </div>
+                    {% if form.picture.errors %}
+                    <ul class="text-xs text-red-500">{% for e in form.picture.errors %}<li>{{ e }}</li>{% endfor %}</ul>
+                    {% endif %}
+                </div>
+
+                <!-- 区切り -->
+                <div class="flex items-center gap-3">
+                    <hr class="flex-1 border-stone-200">
+                    <span class="text-xs text-stone-400">または</span>
+                    <hr class="flex-1 border-stone-200">
+                </div>
+
+                <!-- 検索トリガー -->
+                <button type="button" id="thumbnail-search-toggle"
+                        class="w-full inline-flex items-center justify-center gap-2 border border-stone-200 text-stone-600 py-2 rounded-lg hover:border-accent-400 hover:text-accent-700 hover:bg-accent-50/30 transition-colors text-sm font-medium">
+                    <i data-lucide="image-search" class="w-4 h-4"></i>
+                    表紙画像を検索
+                </button>
+
+                <!-- 著者入力 + 検索ボタン -->
+                <div id="thumbnail-search-panel" class="hidden space-y-2">
+                    <input id="thumbnail-author" type="text" placeholder="著者名（任意）"
+                           class="w-full border border-stone-200 rounded-lg px-3 py-2 text-sm bg-[#FAF8F4] outline-none focus:border-accent-500 focus:ring-2 focus:ring-accent-100 transition-colors">
+                    <button type="button" id="thumbnail-search-btn"
+                            class="w-full bg-stone-700 text-white py-2 rounded-lg hover:bg-stone-600 transition-colors text-sm font-medium">
+                        検索する
+                    </button>
+                </div>
+
+                <!-- 候補グリッド -->
+                <div id="thumbnail-results" class="hidden grid grid-cols-5 gap-2"></div>
+
+                {{ form.image_url }}
+            </div>
         </div>
 
         <!-- 本全体の感想セクション (thoughts) -->
@@ -166,6 +223,7 @@
 {% block scripts %}
 <script src="/static/wisme/js/search.js"></script>
 <script src="/static/wisme/js/chapter_formset.js"></script>
+<script src="/static/wisme/js/thumbnail_search.js"></script>
 <script>
 const toggle = document.getElementById('mobile-search-toggle');
 const panel  = document.getElementById('mobile-search-panel');

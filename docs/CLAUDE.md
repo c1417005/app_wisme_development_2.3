@@ -29,7 +29,8 @@ python manage.py test
 `myproject/` に `.env` ファイルを作成し、以下を記載する：
 
 ```
-GOOGLE_API_KEY=<your Gemini API key>
+GOOGLE_GEMINI_API_KEY=<your Gemini API key>
+GOOGLE_BOOKS_API_KEY=<your Google Books API key>
 SECRET_KEY=<Django secret key>
 DATABASE_URL=<DB接続文字列（本番はPostgreSQL）>
 DEBUG=True
@@ -120,7 +121,7 @@ DEBUG=True
 - 将来的に AWS/GCP への移行を視野に入れたスケーラブルな設計を意識する。
 
 ### 環境変数管理
-- `django-environ` を使い、`SECRET_KEY`・`DATABASE_URL`・`GOOGLE_API_KEY` 等をすべて `.env` から読み込む。
+- `django-environ` を使い、`SECRET_KEY`・`DATABASE_URL`・`GOOGLE_GEMINI_API_KEY`・`GOOGLE_BOOKS_API_KEY` 等をすべて `.env` から読み込む。
 - 本番サーバーでは `.env` ではなく OS 環境変数（PythonAnywhere の Web タブで設定）を使用する。
 - `.env.example` をリポジトリに含め、必要なキーを明示する（値は空欄）。
 
@@ -186,7 +187,7 @@ DEBUG=True
 | 010 | PythonAnywhere デプロイ | 未着手 | 未作成 |
 | 011 | UI/UX 実装（デザインシステム・全画面フロントエンド） | 未着手 | 未作成 |
 | 012 | 章単位メモ機能（Chapter モデル・動的フォーム） | 完了 | 完了（6件） |
-| 013 | 書籍サムネイル自動取得（Google Books API） | 未着手 | 未作成 |
+| 013 | 書籍サムネイル自動取得（Google Books API） | 完了 | 未作成 |
 
 > チケットの DoD チェックボックスは **自動テスト（`python manage.py test`）が通過した項目のみ** `[x]` とする。
 

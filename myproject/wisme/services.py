@@ -1,3 +1,11 @@
+import logging
+
+import requests
+
+from django.conf import settings
+
+logger = logging.getLogger(__name__)
+
 from .models import SearchedWord
 from .utils.func_api import GeminiAsk
 
@@ -23,3 +31,49 @@ class WordService:
             instance.meaning = meaning
             instance.save(update_fields=['meaning'])
         return instance
+
+
+class BookThumbnailService:
+    _ENDPOINT = 'https://www.googleapis.com/books/v1/volumes'
+
+    @staticmethod
+    def search(title: str, author: str = '') -> list[dict]:
+        q = f'intitle:{title}'
+        if author:
+            q += f'+inauthor:{author}'
+        params: dict = {
+            'q': q,
+            'maxResults': '8',
+            'printType': 'books',
+        }
+        api_key = getattr(settings, 'GOOGLE_BOOKS_API_KEY', '')
+        if api_key:
+            params['key'] = api_key
+        try:
+            res = requests.get(
+                BookThumbnailService._ENDPOINT,
+                params=params,
+                timeout=10,
+                proxies={'http': None, 'https': None},
+            )
+            res.raise_for_status()
+            data = res.json()
+        except Exception as e:
+            logger.warning('BookThumbnailService: request failed: %s', e)
+            return []
+
+        results = []
+        for item in data.get('items', []):
+            info = item.get('volumeInfo', {})
+            images = info.get('imageLinks', {})
+            thumbnail = images.get('thumbnail') or images.get('smallThumbnail', '')
+            if not thumbnail:
+                continue
+            thumbnail = thumbnail.replace('http://', 'https://')
+            results.append({
+                'title': info.get('title', ''),
+                'thumbnail': thumbnail,
+            })
+            if len(results) == 5:
+                break
+        return results

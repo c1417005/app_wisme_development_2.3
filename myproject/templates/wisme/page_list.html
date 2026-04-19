@@ -20,6 +20,10 @@
             {% if page.picture %}
             <img src="{{ page.picture.url }}" alt="{{ page.title }}"
                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+            {% elif page.image_url %}
+            <img src="{{ page.image_url }}" alt="{{ page.title }}"
+                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                 onerror="this.parentElement.innerHTML='<div class=\'w-full h-full flex flex-col items-center justify-center p-3 bg-gradient-to-b from-stone-100 to-stone-200\'><p class=\'text-xs text-stone-500 text-center leading-tight font-medium line-clamp-3\'>{{ page.title }}</p></div>'">
             {% else %}
             <div class="w-full h-full flex flex-col items-center justify-center p-3 bg-gradient-to-b from-stone-100 to-stone-200">
                 <i data-lucide="book-open" class="w-8 h-8 text-stone-300 mb-2"></i>

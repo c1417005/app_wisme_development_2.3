@@ -10,6 +10,10 @@
         {% if page.picture %}
         <img src="{{ page.picture.url }}" alt="{{ page.title }}"
              class="w-20 h-28 object-cover rounded-xl shadow-sm shrink-0">
+        {% elif page.image_url %}
+        <img src="{{ page.image_url }}" alt="{{ page.title }}"
+             class="w-20 h-28 object-cover rounded-xl shadow-sm shrink-0"
+             onerror="this.style.display='none'">
         {% endif %}
         <div class="flex-1 min-w-0">
             <p class="text-xs text-stone-400 mb-1">{{ page.page_date }}</p>

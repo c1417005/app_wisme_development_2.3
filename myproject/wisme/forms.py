@@ -17,7 +17,10 @@ class PageForm(ModelForm):
 
     class Meta:
         model = Page
-        fields = ["title","thoughts","page_date","picture"]
+        fields = ["title", "thoughts", "page_date", "picture", "image_url"]
+        widgets = {
+            'image_url': forms.HiddenInput(),
+        }
 
 
 class ChapterForm(ModelForm):

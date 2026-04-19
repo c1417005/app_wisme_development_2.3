@@ -45,6 +45,8 @@ class Page(models.Model):
 
     picture = models.ImageField(upload_to="wisme/picture/",blank = True,null = True,verbose_name="写真")
 
+    image_url = models.URLField(max_length=500, null=True, blank=True, verbose_name="サムネイルURL")
+
     created_at = models.DateTimeField(auto_now_add = True,verbose_name="作成日時")#このデータが初めて作成されたその時の日時を保存
 
     update_at = models.DateTimeField(auto_now = True,verbose_name="更新日時")#更新されたら日時を保存

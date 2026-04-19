@@ -67,7 +67,7 @@ PythonAnywhere の Static Files タブで `/media/` → `media/` へのマッピ
 2. リポジトリをクローン：`git clone <repo_url>`
 3. 仮想環境を作成：`python -m venv venv && source venv/bin/activate`
 4. 依存関係をインストール：`pip install -r requirements.txt`
-5. OS 環境変数（Web タブ）に `SECRET_KEY`, `DATABASE_URL`, `GOOGLE_API_KEY`, `FIELD_ENCRYPTION_KEY` を設定。
+5. OS 環境変数（Web タブ）に `SECRET_KEY`, `DATABASE_URL`, `GOOGLE_GEMINI_API_KEY`, `GOOGLE_BOOKS_API_KEY`, `FIELD_ENCRYPTION_KEY` を設定。
 6. `python manage.py migrate` を実行。
 7. `python manage.py collectstatic` を実行。
 8. Web タブで WSGI ファイルのパスを設定する。

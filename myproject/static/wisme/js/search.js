@@ -54,9 +54,9 @@ function setupPanel(prefix) {
 
     function appendResult(word, meaning) {
         const card = document.createElement('div');
-        card.className = 'bg-stone-50 rounded-xl p-3 relative';
+        card.className = 'bg-stone-50 rounded-xl p-3 pr-7 relative border-l-2 border-accent-300';
         card.innerHTML = `
-            <p class="font-medium text-stone-800 text-sm mb-1">${escHtml(word)}</p>
+            <p class="font-semibold text-accent-700 text-sm mb-1">${escHtml(word)}</p>
             <p class="text-xs text-stone-500 leading-relaxed">${escHtml(meaning)}</p>
             <button class="absolute top-2 right-2 text-stone-300 hover:text-stone-500 transition-colors"
                     onclick="this.closest('div').remove()" title="非表示">

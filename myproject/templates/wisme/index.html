@@ -26,8 +26,9 @@
 
     <!-- 再開ボタン -->
     {% if latest_page %}
-    <section class="bg-white rounded-2xl shadow-sm border border-stone-100 p-6">
-        <p class="text-xs text-stone-400 uppercase tracking-widest mb-3">いま、何を読んでいますか？</p>
+    <section class="relative bg-white rounded-2xl shadow-sm border border-stone-100 p-6 overflow-hidden">
+        <span class="absolute left-0 top-6 bottom-6 w-1 rounded-r bg-accent-500/70" aria-hidden="true"></span>
+        <p class="text-xs text-accent-600 uppercase tracking-widest mb-3 font-medium">いま、何を読んでいますか？</p>
         <div class="flex items-center gap-4">
             {% if latest_page.picture %}
             <img src="{{ latest_page.picture.url }}"

@@ -1,0 +1,27 @@
+{% extends "base/wisme_base.html" %}
+{% block title %}ログアウト — Wisme{% endblock %}
+
+{% block body %}
+<div class="max-w-md mx-auto">
+    <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-8 text-center space-y-4">
+        <div class="w-12 h-12 bg-stone-100 rounded-full flex items-center justify-center mx-auto">
+            <i data-lucide="log-out" class="w-6 h-6 text-stone-400"></i>
+        </div>
+        <h1 class="text-lg font-semibold text-stone-800">ログアウトしますか？</h1>
+        <p class="text-xs text-stone-400 leading-relaxed">またいつでも戻ってきてください。<br>再度ログインすれば、書いたメモはそのまま残っています。</p>
+
+        <form method="POST" action="{% url 'account_logout' %}" class="flex gap-3 pt-2">
+            {% csrf_token %}
+            {{ redirect_field }}
+            <a href="{% url 'wisme:index' %}"
+               class="flex-1 border border-stone-200 text-stone-600 py-2.5 rounded-lg text-sm hover:bg-stone-50 transition-colors">
+                キャンセル
+            </a>
+            <button type="submit"
+                    class="flex-1 bg-stone-800 text-white py-2.5 rounded-lg text-sm hover:bg-stone-700 transition-colors font-medium">
+                ログアウト
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

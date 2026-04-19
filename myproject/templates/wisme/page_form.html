@@ -17,9 +17,9 @@
         {% if field.name != 'input_word' %}
         <div class="space-y-1">
             <label class="block text-sm font-medium text-stone-600">{{ field.label }}</label>
-            <div class="[&_input]:w-full [&_input]:border [&_input]:border-stone-200 [&_input]:rounded-lg [&_input]:px-3 [&_input]:py-2 [&_input]:text-sm [&_input]:bg-[#FAF8F4] [&_input]:outline-none [&_input]:focus:border-stone-400
-                        [&_textarea]:w-full [&_textarea]:border [&_textarea]:border-stone-200 [&_textarea]:rounded-lg [&_textarea]:px-3 [&_textarea]:py-2 [&_textarea]:text-sm [&_textarea]:bg-[#FAF8F4] [&_textarea]:outline-none [&_textarea]:focus:border-stone-400 [&_textarea]:resize-none [&_textarea]:h-48
-                        [&_input[type=file]]:border-0 [&_input[type=file]]:p-0 [&_input[type=file]]:bg-transparent">
+            <div class="[&_input]:w-full [&_input]:border [&_input]:border-stone-200 [&_input]:rounded-lg [&_input]:px-3 [&_input]:py-2 [&_input]:text-sm [&_input]:bg-[#FAF8F4] [&_input]:outline-none [&_input]:transition-colors [&_input]:focus:border-accent-500 [&_input]:focus:ring-2 [&_input]:focus:ring-accent-100
+                        [&_textarea]:w-full [&_textarea]:border [&_textarea]:border-stone-200 [&_textarea]:rounded-lg [&_textarea]:px-3 [&_textarea]:py-2 [&_textarea]:text-sm [&_textarea]:bg-[#FAF8F4] [&_textarea]:outline-none [&_textarea]:transition-colors [&_textarea]:focus:border-accent-500 [&_textarea]:focus:ring-2 [&_textarea]:focus:ring-accent-100 [&_textarea]:resize-none [&_textarea]:h-48
+                        [&_input[type=file]]:border-0 [&_input[type=file]]:p-0 [&_input[type=file]]:bg-transparent [&_input[type=file]]:ring-0 [&_input[type=file]]:focus:ring-0">
                 {{ field }}
             </div>
             {% if field.errors %}

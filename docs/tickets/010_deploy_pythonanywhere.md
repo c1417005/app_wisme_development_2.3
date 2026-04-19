@@ -8,7 +8,7 @@
 
 ### 背景
 - 現在はローカルの SQLite で動作しており、本番デプロイが行われていない。
-- PythonAnywhere の無料プランで PostgreSQL を使用できる。
+- PythonAnywhere の有料プランで PostgreSQL を使用できる。無料プランはMysql
 - `django-environ` による環境変数管理（CLAUDE.md 記載）を本番でも活用する。
 
 ---

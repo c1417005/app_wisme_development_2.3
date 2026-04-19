@@ -18,8 +18,11 @@
         {% for field in form %}
         <div class="space-y-1">
             <label class="block text-sm font-medium text-stone-600">{{ field.label }}</label>
-            <div class="[&_input]:w-full [&_input]:border [&_input]:border-stone-200 [&_input]:rounded-lg [&_input]:px-3 [&_input]:py-2 [&_input]:text-sm [&_input]:bg-[#FAF8F4] [&_input]:outline-none [&_input]:focus:border-stone-400
-                        [&_input[type=file]]:border-0 [&_input[type=file]]:p-0 [&_input[type=file]]:bg-transparent">
+            <div class="text-sm text-stone-600 leading-loose
+                        [&_input]:w-full [&_input]:border [&_input]:border-stone-200 [&_input]:rounded-lg [&_input]:px-3 [&_input]:py-2 [&_input]:text-sm [&_input]:bg-[#FAF8F4] [&_input]:outline-none [&_input]:transition-colors [&_input]:focus:border-accent-500 [&_input]:focus:ring-2 [&_input]:focus:ring-accent-100
+                        [&_input[type=file]]:border-0 [&_input[type=file]]:p-0 [&_input[type=file]]:bg-transparent [&_input[type=file]]:ring-0 [&_input[type=file]]:focus:ring-0
+                        [&_input[type=checkbox]]:!w-4 [&_input[type=checkbox]]:!h-4 [&_input[type=checkbox]]:!p-0 [&_input[type=checkbox]]:!m-0 [&_input[type=checkbox]]:!ml-3 [&_input[type=checkbox]]:!mr-1 [&_input[type=checkbox]]:align-middle [&_input[type=checkbox]]:!rounded [&_input[type=checkbox]]:!border [&_input[type=checkbox]]:!border-stone-300 [&_input[type=checkbox]]:!bg-white [&_input[type=checkbox]]:accent-accent-500 [&_input[type=checkbox]]:!ring-0
+                        [&>label]:align-middle [&>label]:cursor-pointer [&>a]:text-accent-700 [&>a]:underline [&>a]:underline-offset-2 [&>a]:hover:text-accent-500">
                 {{ field }}
             </div>
             {% if field.errors %}

@@ -20,7 +20,7 @@
     <!-- 感想 -->
     {% if page.thoughts %}
     <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6">
-        <h2 class="text-xs font-medium text-stone-400 uppercase tracking-widest mb-3">メモ・感想</h2>
+        <h2 class="text-xs font-medium text-accent-600 uppercase tracking-widest mb-3">メモ・感想</h2>
         <div class="text-sm text-stone-700 leading-relaxed whitespace-pre-line">{{ page.thoughts }}</div>
     </div>
     {% endif %}
@@ -28,7 +28,7 @@
     <!-- 調べた単語 -->
     {% if words %}
     <div class="bg-white rounded-2xl border border-stone-100 shadow-sm p-6">
-        <h2 class="text-xs font-medium text-stone-400 uppercase tracking-widest mb-4">調べた単語</h2>
+        <h2 class="text-xs font-medium text-accent-600 uppercase tracking-widest mb-4">調べた単語</h2>
         <div class="space-y-3">
             {% for word in words %}
             <div class="flex gap-3">

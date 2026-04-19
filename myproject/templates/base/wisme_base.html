@@ -9,7 +9,19 @@
         tailwind.config = {
             theme: {
                 extend: {
-                    colors: { paper: '#FAF8F4', ink: '#2C2C2C' },
+                    colors: {
+                        paper: '#FAF8F4',
+                        ink: '#2C2C2C',
+                        accent: {
+                            50:  '#F8EFE0',
+                            100: '#EFDEC0',
+                            200: '#E2C79A',
+                            300: '#C4A27A',
+                            500: '#8B6F47',
+                            600: '#7A5E3A',
+                            700: '#6B5435'
+                        }
+                    },
                     fontFamily: { sans: ['Hiragino Kaku Gothic Pro', 'Meiryo', 'sans-serif'] }
                 }
             }
@@ -22,33 +34,53 @@
 
     <header class="border-b border-stone-200 bg-white/90 backdrop-blur-sm sticky top-0 z-40">
         <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-            <a href="{% url 'wisme:index' %}" class="text-lg font-semibold tracking-widest text-stone-800">Wisme</a>
-            <nav class="flex items-center gap-5 text-sm text-stone-500">
+            <a href="{% url 'wisme:index' %}" class="text-lg font-semibold tracking-widest text-accent-700 hover:text-accent-500 transition-colors">Wisme</a>
+            <nav class="flex items-center gap-1 sm:gap-1.5 text-sm text-stone-500">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'wisme:page_create' %}" class="flex items-center gap-1 hover:text-stone-900 transition-colors">
+                    <a href="{% url 'wisme:page_create' %}"
+                       class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-amber-100 hover:text-amber-800 transition-colors">
                         <i data-lucide="book-plus" class="w-4 h-4"></i>
                         <span class="hidden sm:inline">新しいメモ</span>
                     </a>
-                    <a href="{% url 'wisme:page_list' %}" class="flex items-center gap-1 hover:text-stone-900 transition-colors">
+                    <a href="{% url 'wisme:page_list' %}"
+                       class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-accent-100 hover:text-accent-700 transition-colors">
                         <i data-lucide="library" class="w-4 h-4"></i>
                         <span class="hidden sm:inline">メモ一覧</span>
                     </a>
-                    <a href="{% url 'wisme:word_list' %}" class="flex items-center gap-1 hover:text-stone-900 transition-colors">
+                    <a href="{% url 'wisme:word_list' %}"
+                       class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-emerald-100 hover:text-emerald-800 transition-colors">
                         <i data-lucide="notebook-text" class="w-4 h-4"></i>
                         <span class="hidden sm:inline">単語帳</span>
                     </a>
-                    <a href="{% url 'wisme:flashcard' %}" class="flex items-center gap-1 hover:text-stone-900 transition-colors">
+                    <a href="{% url 'wisme:flashcard' %}"
+                       class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-sky-100 hover:text-sky-800 transition-colors">
                         <i data-lucide="layers" class="w-4 h-4"></i>
                         <span class="hidden sm:inline">カード</span>
                     </a>
-                    <a href="{% url 'wisme:profile' %}" class="flex items-center gap-1 hover:text-stone-900 transition-colors">
-                        <i data-lucide="user-circle" class="w-4 h-4"></i>
+                    {% with sa=user.socialaccount_set.first %}
+                    <a href="{% url 'wisme:profile' %}"
+                       class="flex items-center gap-1.5 rounded-lg px-2 py-1 hover:bg-rose-100 hover:text-rose-800 transition-colors">
+                        {% if user.profile_image %}
+                            <img src="{{ user.profile_image.url }}" alt=""
+                                 class="w-7 h-7 rounded-full object-cover border border-stone-200">
+                        {% elif sa.get_avatar_url %}
+                            <img src="{{ sa.get_avatar_url }}" alt="" referrerpolicy="no-referrer"
+                                 class="w-7 h-7 rounded-full object-cover border border-stone-200">
+                        {% else %}
+                            <span class="w-7 h-7 rounded-full bg-stone-100 flex items-center justify-center border border-stone-200">
+                                <i data-lucide="user" class="w-4 h-4 text-stone-400"></i>
+                            </span>
+                        {% endif %}
                         <span class="hidden sm:inline">{{ user.display_name|default:user.username }}</span>
                     </a>
-                    <a href="{% url 'account_logout' %}" class="text-stone-400 hover:text-stone-700 transition-colors text-xs">ログアウト</a>
+                    {% endwith %}
+                    <a href="{% url 'account_logout' %}"
+                       class="ml-1 rounded-lg px-2.5 py-1.5 text-xs text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors">ログアウト</a>
                 {% else %}
-                    <a href="{% url 'account_login' %}" class="hover:text-stone-900 transition-colors">ログイン</a>
-                    <a href="{% url 'account_signup' %}" class="bg-stone-800 text-white px-3 py-1.5 rounded-md text-xs hover:bg-stone-700 transition-colors">新規登録</a>
+                    <a href="{% url 'account_login' %}"
+                       class="rounded-lg px-2.5 py-1.5 hover:bg-stone-100 hover:text-stone-900 transition-colors">ログイン</a>
+                    <a href="{% url 'account_signup' %}"
+                       class="bg-accent-500 text-white px-3 py-1.5 rounded-md text-xs hover:bg-accent-600 transition-colors">新規登録</a>
                 {% endif %}
             </nav>
         </div>

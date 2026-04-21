@@ -21,6 +21,7 @@ class PageForm(ModelForm):
         fields = ["title", "thoughts", "page_date", "picture", "image_url"]
         widgets = {
             'image_url': forms.HiddenInput(),
+            'page_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
 

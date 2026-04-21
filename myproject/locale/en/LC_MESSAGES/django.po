@@ -1,0 +1,314 @@
+# English translations for Wisme.
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "新しいメモ"
+msgstr "New Note"
+
+msgid "メモ一覧"
+msgstr "Notes"
+
+msgid "単語帳"
+msgstr "Vocabulary"
+
+msgid "カード"
+msgstr "Cards"
+
+msgid "ログアウト"
+msgstr "Logout"
+
+msgid "ログイン"
+msgstr "Login"
+
+msgid "新規登録"
+msgstr "Sign Up"
+
+msgid "ホーム"
+msgstr "Home"
+
+msgid "Wisme へようこそ"
+msgstr "Welcome to Wisme"
+
+msgid "読んでいる本のメモを書きながら、"
+msgstr "Take notes on books you're reading,"
+
+msgid "気になった単語をその場で調べて保存できるツールです。"
+msgstr "look up words you're curious about, and save them on the spot."
+
+msgid "あとで自分のメモを読み返すのが、きっと楽しくなります。"
+msgstr "Reading back your own notes later will be a delight."
+
+msgid "最初のメモを書く"
+msgstr "Write your first note"
+
+msgid "いま、何を読んでいますか？"
+msgstr "What are you reading now?"
+
+msgid "再開する"
+msgstr "Resume"
+
+msgid "メモ一覧を見る"
+msgstr "View all notes"
+
+msgid "新しいメモを書く"
+msgstr "Write a new note"
+
+msgid "久しぶりに自分の書いたメモを"
+msgstr "How about revisiting"
+
+msgid "振り返ってみませんか？"
+msgstr "the notes you've written?"
+
+msgid "前回のメモ更新から少し時間が経っています。"
+msgstr "It's been a while since your last update."
+
+msgid "メモを見る"
+msgstr "View notes"
+
+msgid "あとで"
+msgstr "Later"
+
+msgid "まだメモがありません。"
+msgstr "No notes yet."
+
+msgid "本全体の感想"
+msgstr "Overall Impressions"
+
+msgid "章ごとのメモ"
+msgstr "Chapter Notes"
+
+msgid "調べた単語"
+msgstr "Looked-up Words"
+
+msgid "編集する"
+msgstr "Edit"
+
+msgid "このメモを削除しますか？"
+msgstr "Delete this note?"
+
+msgid "削除すると元に戻せません。紐づいた単語も削除されます。"
+msgstr "This cannot be undone. Associated words will also be deleted."
+
+msgid "キャンセル"
+msgstr "Cancel"
+
+msgid "削除する"
+msgstr "Delete"
+
+msgid "削除の確認"
+msgstr "Confirm Deletion"
+
+msgid "メモを書く"
+msgstr "Write a Note"
+
+msgid "本の情報"
+msgstr "Book Info"
+
+msgid "表紙画像"
+msgstr "Cover Image"
+
+msgid "選択した表紙"
+msgstr "Selected cover"
+
+msgid "APIから取得した表紙画像"
+msgstr "Cover image from API"
+
+msgid "ファイルをアップロード（任意）"
+msgstr "Upload a file (optional)"
+
+msgid "または"
+msgstr "or"
+
+msgid "表紙画像を検索"
+msgstr "Search cover image"
+
+msgid "著者名（任意）"
+msgstr "Author name (optional)"
+
+msgid "検索する"
+msgstr "Search"
+
+msgid "この本を通して思ったこと、全体を振り返る文章。"
+msgstr "Your overall thoughts and reflections on this book."
+
+msgid "任意"
+msgstr "Optional"
+
+msgid "ブログ記事を書くように、章単位で書き残せます。"
+msgstr "Write chapter-by-chapter notes, like a blog post."
+
+msgid "この章を削除"
+msgstr "Remove this chapter"
+
+msgid "章を追加"
+msgstr "Add chapter"
+
+msgid "保存する"
+msgstr "Save"
+
+msgid "保存しました ✓"
+msgstr "Saved ✓"
+
+msgid "単語を調べる"
+msgstr "Look up a word"
+
+msgid "メモを編集"
+msgstr "Edit Note"
+
+msgid "APIで表紙画像を検索"
+msgstr "Search cover image via API"
+
+msgid "このメモで調べた単語"
+msgstr "Words looked up in this note"
+
+msgid "更新する"
+msgstr "Update"
+
+msgid "フラッシュカード"
+msgstr "Flashcards"
+
+msgid "新しい順"
+msgstr "Newest"
+
+msgid "まだ単語が登録されていません。"
+msgstr "No words saved yet."
+
+msgid "メモ作成中に単語を調べると、ここに保存されます。"
+msgstr "Words you look up while writing notes will be saved here."
+
+msgid "カードをクリックすると裏返します。"
+msgstr "Click a card to flip it."
+
+msgid "タップして確認"
+msgstr "Tap to reveal"
+
+msgid "メモ作成中に単語を調べると、カードが作られます。"
+msgstr "Cards will be created when you look up words while writing notes."
+
+msgid "プロフィール"
+msgstr "Profile"
+
+msgid "プロフィール画像"
+msgstr "Profile image"
+
+msgid "ユーザー名"
+msgstr "Username"
+
+msgid "表示名"
+msgstr "Display name"
+
+msgid "未設定"
+msgstr "Not set"
+
+msgid "メール"
+msgstr "Email"
+
+msgid "プロフィールを編集"
+msgstr "Edit profile"
+
+msgid "プロフィール編集"
+msgstr "Edit Profile"
+
+msgid "プロフィールを更新しました ✓"
+msgstr "Profile updated ✓"
+
+msgid "調べる"
+msgstr "Search"
+
+msgid "このメモに保存されました"
+msgstr "Saved to this note"
+
+msgid "Google でログイン"
+msgstr "Sign in with Google"
+
+msgid "アカウントをお持ちでないですか？"
+msgstr "Don't have an account?"
+
+msgid "パスワードを忘れた方"
+msgstr "Forgot your password?"
+
+msgid "メールアドレスで Wisme のアカウントを作成します。"
+msgstr "Create your Wisme account with an email address."
+
+msgid "アカウントを作成"
+msgstr "Create Account"
+
+msgid "Google で登録"
+msgstr "Sign up with Google"
+
+msgid "すでにアカウントをお持ちですか？"
+msgstr "Already have an account?"
+
+msgid "ログアウトしますか？"
+msgstr "Sign out?"
+
+msgid "またいつでも戻ってきてください。"
+msgstr "Come back anytime."
+
+msgid "再度ログインすれば、書いたメモはそのまま残っています。"
+msgstr "Your notes will still be here when you log back in."
+
+#, python-format
+msgid "第%(num)s章"
+msgstr "Chapter %(num)s"
+
+msgid "タイトル"
+msgstr "Title"
+
+msgid "日付"
+msgstr "Date"
+
+msgid "写真"
+msgstr "Photo"
+
+msgid "このドキュメントを読んだ感想(空欄可)"
+msgstr "Overall impressions (optional)"
+
+msgid "サムネイルURL"
+msgstr "Thumbnail URL"
+
+msgid "作成日時"
+msgstr "Created at"
+
+msgid "更新日時"
+msgstr "Updated at"
+
+msgid "章タイトル"
+msgstr "Chapter title"
+
+msgid "章の内容"
+msgstr "Chapter content"
+
+msgid "所属メモ"
+msgstr "Note"
+
+msgid "並び順"
+msgstr "Order"
+
+msgid "意味を知りたい単語"
+msgstr "Word to look up"
+
+msgid "意味"
+msgstr "Meaning"
+
+msgid "検索日時"
+msgstr "Searched at"
+
+msgid "関連メモ"
+msgstr "Related note"
+
+msgid "オーナー"
+msgstr "Owner"
+
+msgid "調べたい単語"
+msgstr "Word to look up"
+
+msgid "章タイトル（任意）"
+msgstr "Chapter title (optional)"
+
+msgid "この章の内容"
+msgstr "Chapter content"

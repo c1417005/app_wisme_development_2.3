@@ -43,7 +43,7 @@ class BookThumbnailService:
             q += f'+inauthor:{author}'
         params: dict = {
             'q': q,
-            'maxResults': '8',
+            'maxResults': '20',
             'printType': 'books',
         }
         api_key = getattr(settings, 'GOOGLE_BOOKS_API_KEY', '')
@@ -74,6 +74,4 @@ class BookThumbnailService:
                 'title': info.get('title', ''),
                 'thumbnail': thumbnail,
             })
-            if len(results) == 5:
-                break
         return results

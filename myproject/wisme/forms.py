@@ -1,5 +1,6 @@
 from django.forms import ModelForm, inlineformset_factory
 from django import forms
+from django.utils.translation import gettext_lazy as _
 from .models import Page, Chapter, CustomUser
 
 
@@ -11,7 +12,7 @@ class UserProfileForm(ModelForm):
 
 class PageForm(ModelForm):
     input_word = forms.CharField(
-        label = "調べたい単語",
+        label = _("調べたい単語"),
         widget = forms.TextInput(attrs={"id":"id_input_word"}),
         required = False)
 
@@ -28,8 +29,8 @@ class ChapterForm(ModelForm):
         model = Chapter
         fields = ['title', 'content', 'order']
         widgets = {
-            'title': forms.TextInput(attrs={'placeholder': '章タイトル（任意）'}),
-            'content': forms.Textarea(attrs={'placeholder': 'この章の内容', 'rows': 6}),
+            'title': forms.TextInput(attrs={'placeholder': _('章タイトル（任意）')}),
+            'content': forms.Textarea(attrs={'placeholder': _('この章の内容'), 'rows': 6}),
             'order': forms.HiddenInput(),
         }
 

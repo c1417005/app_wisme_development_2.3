@@ -1,5 +1,6 @@
 {% extends "base/wisme_base.html" %}
-{% block title %}フラッシュカード — Wisme{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "フラッシュカード" %} — Wisme{% endblock %}
 
 {% block head %}
 <style>
@@ -35,11 +36,11 @@
 {% block body %}
 
 <div class="flex items-center justify-between mb-6">
-    <h1 class="text-xl font-semibold text-stone-800">フラッシュカード</h1>
+    <h1 class="text-xl font-semibold text-stone-800">{% trans "フラッシュカード" %}</h1>
     <div class="flex items-center gap-1 text-xs text-stone-400 bg-white border border-stone-200 rounded-lg overflow-hidden">
         <a href="?sort=created_at"
            class="px-3 py-2 hover:bg-accent-50 transition-colors {% if not request.GET.sort or request.GET.sort == 'created_at' %}bg-accent-50 text-accent-700 font-medium{% endif %}">
-            新しい順
+            {% trans "新しい順" %}
         </a>
         <span class="text-stone-200">|</span>
         <a href="?sort=alpha"
@@ -49,7 +50,7 @@
     </div>
 </div>
 
-<p class="text-xs text-stone-400 mb-6">カードをクリックすると裏返します。</p>
+<p class="text-xs text-stone-400 mb-6">{% trans "カードをクリックすると裏返します。" %}</p>
 
 {% if words %}
 <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -61,7 +62,7 @@
             <div class="flip-face bg-white rounded-2xl border border-stone-100 shadow-sm flex flex-col items-center justify-center p-4 text-center">
                 <p class="font-semibold text-stone-800 text-lg leading-tight">{{ word.word }}</p>
                 <p class="text-xs text-stone-300 mt-2 flex items-center gap-1">
-                    <i data-lucide="rotate-cw" class="w-3 h-3"></i>タップして確認
+                    <i data-lucide="rotate-cw" class="w-3 h-3"></i>{% trans "タップして確認" %}
                 </p>
             </div>
 
@@ -87,8 +88,8 @@
 {% else %}
 <div class="text-center py-20 text-stone-400">
     <i data-lucide="layers" class="w-12 h-12 mx-auto mb-4 opacity-30"></i>
-    <p class="text-sm">まだ単語が登録されていません。</p>
-    <p class="text-xs mt-1">メモ作成中に単語を調べると、カードが作られます。</p>
+    <p class="text-sm">{% trans "まだ単語が登録されていません。" %}</p>
+    <p class="text-xs mt-1">{% trans "メモ作成中に単語を調べると、カードが作られます。" %}</p>
 </div>
 {% endif %}
 

@@ -1,15 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.utils.translation import gettext_lazy as _
 from pathlib import Path
 from encrypted_model_fields.fields import EncryptedCharField
 import uuid
 
 
 class CustomUser(AbstractUser):
-    display_name = EncryptedCharField(max_length=100, blank=True, verbose_name="表示名")
+    display_name = EncryptedCharField(max_length=100, blank=True, verbose_name=_("表示名"))
     profile_image = models.ImageField(
-        upload_to='media/profile/', blank=True, null=True, verbose_name="プロフィール画像"
+        upload_to='media/profile/', blank=True, null=True, verbose_name=_("プロフィール画像")
     )
 
     def save(self, *args, **kwargs):
@@ -30,26 +31,22 @@ class Page(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        verbose_name="オーナー",
+        verbose_name=_("オーナー"),
     )
-    
-    title = models.CharField(max_length=100,verbose_name="タイトル")
 
-    #input_word = models.TextField(max_length=1000,verbose_name="意味を知りたい単語")
+    title = models.CharField(max_length=100,verbose_name=_("タイトル"))
 
-    #return_mean = models.CharField(max_length=100,verbose_name="その単語の意味",null = True)
+    thoughts = models.TextField(max_length=1000,blank=True,verbose_name=_("このドキュメントを読んだ感想(空欄可)"))
 
-    thoughts = models.TextField(max_length=1000,blank=True,verbose_name="このドキュメントを読んだ感想(空欄可)")
+    page_date = models.DateField(verbose_name=_("日付"))
 
-    page_date = models.DateField(verbose_name="日付")
+    picture = models.ImageField(upload_to="wisme/picture/",blank = True,null = True,verbose_name=_("写真"))
 
-    picture = models.ImageField(upload_to="wisme/picture/",blank = True,null = True,verbose_name="写真")
+    image_url = models.URLField(max_length=500, null=True, blank=True, verbose_name=_("サムネイルURL"))
 
-    image_url = models.URLField(max_length=500, null=True, blank=True, verbose_name="サムネイルURL")
+    created_at = models.DateTimeField(auto_now_add = True,verbose_name=_("作成日時"))
 
-    created_at = models.DateTimeField(auto_now_add = True,verbose_name="作成日時")#このデータが初めて作成されたその時の日時を保存
-
-    update_at = models.DateTimeField(auto_now = True,verbose_name="更新日時")#更新されたら日時を保存
+    update_at = models.DateTimeField(auto_now = True,verbose_name=_("更新日時"))
 
 
 
@@ -68,13 +65,13 @@ class Chapter(models.Model):
         Page,
         on_delete=models.CASCADE,
         related_name='chapters',
-        verbose_name='所属メモ',
+        verbose_name=_('所属メモ'),
     )
-    order = models.PositiveIntegerField(default=0, verbose_name='並び順')
-    title = models.CharField(max_length=100, blank=True, verbose_name='章タイトル')
-    content = models.TextField(blank=True, verbose_name='章の内容')
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name='作成日時')
-    update_at = models.DateTimeField(auto_now=True, verbose_name='更新日時')
+    order = models.PositiveIntegerField(default=0, verbose_name=_('並び順'))
+    title = models.CharField(max_length=100, blank=True, verbose_name=_('章タイトル'))
+    content = models.TextField(blank=True, verbose_name=_('章の内容'))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_('作成日時'))
+    update_at = models.DateTimeField(auto_now=True, verbose_name=_('更新日時'))
 
     class Meta:
         ordering = ['order', 'created_at']
@@ -89,7 +86,7 @@ class SearchedWord(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        verbose_name="オーナー",
+        verbose_name=_("オーナー"),
     )
     note = models.ForeignKey(
         Page,
@@ -97,11 +94,11 @@ class SearchedWord(models.Model):
         related_name='words',
         null = True,
         blank = True,
-        verbose_name = "関連メモ"
+        verbose_name=_("関連メモ")
     )
-    word = models.CharField(max_length=100, db_index=True, verbose_name="意味を知りたい単語")
-    meaning = models.TextField(verbose_name="意味")
-    created_at = models.DateTimeField(auto_now_add = True,verbose_name="検索日時")
+    word = models.CharField(max_length=100, db_index=True, verbose_name=_("意味を知りたい単語"))
+    meaning = models.TextField(verbose_name=_("意味"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("検索日時"))
 
 
     def __str__(self):

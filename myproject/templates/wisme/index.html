@@ -1,5 +1,6 @@
 {% extends "base/wisme_base.html" %}
-{% block title %}Wisme — ホーム{% endblock %}
+{% load i18n %}
+{% block title %}Wisme — {% trans "ホーム" %}{% endblock %}
 
 {% block body %}
 
@@ -7,16 +8,16 @@
 <!-- 初回ウェルカム UI -->
 <div class="max-w-xl mx-auto text-center py-16">
     <p class="text-4xl mb-6">📖</p>
-    <h2 class="text-2xl font-semibold text-stone-800 mb-3">Wisme へようこそ</h2>
+    <h2 class="text-2xl font-semibold text-stone-800 mb-3">{% trans "Wisme へようこそ" %}</h2>
     <p class="text-stone-500 leading-relaxed mb-8">
-        読んでいる本のメモを書きながら、<br>
-        気になった単語をその場で調べて保存できるツールです。<br>
-        あとで自分のメモを読み返すのが、きっと楽しくなります。
+        {% trans "読んでいる本のメモを書きながら、" %}<br>
+        {% trans "気になった単語をその場で調べて保存できるツールです。" %}<br>
+        {% trans "あとで自分のメモを読み返すのが、きっと楽しくなります。" %}
     </p>
     <a href="{% url 'wisme:page_create' %}"
        class="inline-flex items-center gap-2 bg-stone-800 text-white px-6 py-3 rounded-lg hover:bg-stone-700 transition-colors font-medium">
         <i data-lucide="book-plus" class="w-5 h-5"></i>
-        最初のメモを書く
+        {% trans "最初のメモを書く" %}
     </a>
 </div>
 
@@ -28,7 +29,7 @@
     {% if latest_page %}
     <section class="relative bg-white rounded-2xl shadow-sm border border-stone-100 p-6 overflow-hidden">
         <span class="absolute left-0 top-6 bottom-6 w-1 rounded-r bg-accent-500/70" aria-hidden="true"></span>
-        <p class="text-xs text-accent-600 uppercase tracking-widest mb-3 font-medium">いま、何を読んでいますか？</p>
+        <p class="text-xs text-accent-600 uppercase tracking-widest mb-3 font-medium">{% trans "いま、何を読んでいますか？" %}</p>
         <div class="flex items-center gap-4">
             {% if latest_page.picture %}
             <img src="{{ latest_page.picture.url }}"
@@ -45,7 +46,7 @@
             <a href="{% url 'wisme:page_update' latest_page.id %}"
                class="shrink-0 inline-flex items-center gap-2 bg-stone-800 text-white px-4 py-2 rounded-lg hover:bg-stone-700 transition-colors text-sm font-medium">
                 <i data-lucide="pencil" class="w-4 h-4"></i>
-                再開する
+                {% trans "再開する" %}
             </a>
         </div>
     </section>
@@ -56,12 +57,12 @@
         <a href="{% url 'wisme:page_list' %}"
            class="flex-1 flex items-center justify-center gap-2 border border-stone-200 bg-white rounded-xl py-4 text-stone-600 hover:border-stone-400 hover:text-stone-800 transition-colors text-sm font-medium">
             <i data-lucide="library" class="w-4 h-4"></i>
-            メモ一覧を見る
+            {% trans "メモ一覧を見る" %}
         </a>
         <a href="{% url 'wisme:page_create' %}"
            class="flex-1 flex items-center justify-center gap-2 border border-stone-200 bg-white rounded-xl py-4 text-stone-600 hover:border-stone-400 hover:text-stone-800 transition-colors text-sm font-medium">
             <i data-lucide="book-plus" class="w-4 h-4"></i>
-            新しいメモを書く
+            {% trans "新しいメモを書く" %}
         </a>
     </section>
 
@@ -71,16 +72,16 @@
 <div id="review-popup"
      class="hidden fixed inset-0 bg-black/20 z-50 flex items-end sm:items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-xl p-6 max-w-sm w-full">
-        <p class="text-base font-medium text-stone-800 mb-2">久しぶりに自分の書いたメモを<br>振り返ってみませんか？</p>
-        <p class="text-sm text-stone-400 mb-5">前回のメモ更新から少し時間が経っています。</p>
+        <p class="text-base font-medium text-stone-800 mb-2">{% trans "久しぶりに自分の書いたメモを" %}<br>{% trans "振り返ってみませんか？" %}</p>
+        <p class="text-sm text-stone-400 mb-5">{% trans "前回のメモ更新から少し時間が経っています。" %}</p>
         <div class="flex gap-3">
             <a href="{% url 'wisme:page_list' %}"
                class="flex-1 bg-stone-800 text-white text-sm py-2.5 rounded-lg text-center hover:bg-stone-700 transition-colors font-medium">
-                メモを見る
+                {% trans "メモを見る" %}
             </a>
             <button id="popup-dismiss"
                     class="flex-1 border border-stone-200 text-stone-500 text-sm py-2.5 rounded-lg hover:bg-stone-50 transition-colors">
-                あとで
+                {% trans "あとで" %}
             </button>
         </div>
     </div>

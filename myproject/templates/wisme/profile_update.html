@@ -1,14 +1,17 @@
 {% extends "base/wisme_base.html" %}
-{% block title %}プロフィール編集 — Wisme{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "プロフィール編集" %} — Wisme{% endblock %}
 
 {% block body %}
+
+{% trans "プロフィールを更新しました ✓" as profile_toast %}
 
 <div class="max-w-md mx-auto">
     <div class="flex items-center gap-3 mb-6">
         <a href="{% url 'wisme:profile' %}" class="text-stone-400 hover:text-stone-700 transition-colors">
             <i data-lucide="arrow-left" class="w-5 h-5"></i>
         </a>
-        <h1 class="text-xl font-semibold text-stone-800">プロフィール編集</h1>
+        <h1 class="text-xl font-semibold text-stone-800">{% trans "プロフィール編集" %}</h1>
     </div>
 
     <form method="POST" enctype="multipart/form-data"
@@ -35,8 +38,8 @@
 
         <button type="submit"
                 class="w-full bg-stone-800 text-white py-2.5 rounded-lg hover:bg-stone-700 transition-colors font-medium text-sm"
-                onclick="showToast('プロフィールを更新しました ✓')">
-            保存する
+                data-toast="{{ profile_toast }}" onclick="showToast(this.dataset.toast)">
+            {% trans "保存する" %}
         </button>
     </form>
 </div>

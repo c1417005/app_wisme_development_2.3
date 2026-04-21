@@ -1,5 +1,6 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -40,22 +41,22 @@
                     <a href="{% url 'wisme:page_create' %}"
                        class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-amber-100 hover:text-amber-800 transition-colors">
                         <i data-lucide="book-plus" class="w-4 h-4"></i>
-                        <span class="hidden sm:inline">新しいメモ</span>
+                        <span class="hidden sm:inline">{% trans "新しいメモ" %}</span>
                     </a>
                     <a href="{% url 'wisme:page_list' %}"
                        class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-accent-100 hover:text-accent-700 transition-colors">
                         <i data-lucide="library" class="w-4 h-4"></i>
-                        <span class="hidden sm:inline">メモ一覧</span>
+                        <span class="hidden sm:inline">{% trans "メモ一覧" %}</span>
                     </a>
                     <a href="{% url 'wisme:word_list' %}"
                        class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-emerald-100 hover:text-emerald-800 transition-colors">
                         <i data-lucide="notebook-text" class="w-4 h-4"></i>
-                        <span class="hidden sm:inline">単語帳</span>
+                        <span class="hidden sm:inline">{% trans "単語帳" %}</span>
                     </a>
                     <a href="{% url 'wisme:flashcard' %}"
                        class="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 hover:bg-sky-100 hover:text-sky-800 transition-colors">
                         <i data-lucide="layers" class="w-4 h-4"></i>
-                        <span class="hidden sm:inline">カード</span>
+                        <span class="hidden sm:inline">{% trans "カード" %}</span>
                     </a>
                     {% with sa=user.socialaccount_set.first %}
                     <a href="{% url 'wisme:profile' %}"
@@ -75,13 +76,29 @@
                     </a>
                     {% endwith %}
                     <a href="{% url 'account_logout' %}"
-                       class="ml-1 rounded-lg px-2.5 py-1.5 text-xs text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors">ログアウト</a>
+                       class="ml-1 rounded-lg px-2.5 py-1.5 text-xs text-stone-400 hover:bg-stone-100 hover:text-stone-700 transition-colors">{% trans "ログアウト" %}</a>
                 {% else %}
                     <a href="{% url 'account_login' %}"
-                       class="rounded-lg px-2.5 py-1.5 hover:bg-stone-100 hover:text-stone-900 transition-colors">ログイン</a>
+                       class="rounded-lg px-2.5 py-1.5 hover:bg-stone-100 hover:text-stone-900 transition-colors">{% trans "ログイン" %}</a>
                     <a href="{% url 'account_signup' %}"
-                       class="bg-accent-500 text-white px-3 py-1.5 rounded-md text-xs hover:bg-accent-600 transition-colors">新規登録</a>
+                       class="bg-accent-500 text-white px-3 py-1.5 rounded-md text-xs hover:bg-accent-600 transition-colors">{% trans "新規登録" %}</a>
                 {% endif %}
+
+                <!-- 言語切替 -->
+                <form action="{% url 'set_language' %}" method="post" class="flex items-center ml-1">
+                    {% csrf_token %}
+                    <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                    {% get_available_languages as available_langs %}
+                    <select name="language" onchange="this.form.submit()"
+                            class="text-xs text-stone-400 bg-transparent border border-stone-200 outline-none cursor-pointer py-1 px-1.5 rounded-md hover:border-stone-400 transition-colors">
+                        {% for lang_code, lang_name in available_langs %}
+                        <option value="{{ lang_code }}"
+                                {% if lang_code == LANGUAGE_CODE %}selected{% endif %}>
+                            {{ lang_code|upper }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </form>
             </nav>
         </div>
     </header>

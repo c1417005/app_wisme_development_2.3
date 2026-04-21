@@ -3,8 +3,10 @@ from django.urls import reverse
 from django.core import mail
 from allauth.account.models import EmailAddress
 from wisme.models import CustomUser, Page, Chapter, SearchedWord
-from unittest.mock import patch
+from wisme.services import BookThumbnailService
+from unittest.mock import patch, MagicMock
 import datetime
+import json
 
 
 def make_verified_user(email, password):
@@ -497,3 +499,158 @@ class PageDetailChaptersContextTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn('chapters', response.context)
         self.assertEqual(list(response.context['chapters'])[0].title, '章A')
+
+
+# --- 013 書籍サムネイル自動取得 ---
+
+def _make_api_response(items):
+    """Google Books API レスポンスのモックを生成するヘルパー"""
+    mock_res = MagicMock()
+    mock_res.json.return_value = {'items': items}
+    mock_res.raise_for_status.return_value = None
+    return mock_res
+
+
+def _book_item(title, thumbnail_url):
+    return {
+        'volumeInfo': {
+            'title': title,
+            'imageLinks': {'thumbnail': thumbnail_url},
+        }
+    }
+
+
+# DoD: タイトル（＋著者名）からAPIの検索結果が正しく取得できる（最大20件）
+class BookThumbnailServiceTest(TestCase):
+    @patch('wisme.services.requests.get')
+    def test_title_only_query(self, mock_get):
+        mock_get.return_value = _make_api_response([
+            _book_item('本A', 'https://example.com/a.jpg'),
+        ])
+        results = BookThumbnailService.search('本A')
+        call_params = mock_get.call_args[1]['params']
+        self.assertIn('intitle:本A', call_params['q'])
+        self.assertNotIn('inauthor:', call_params['q'])
+
+    @patch('wisme.services.requests.get')
+    def test_title_and_author_query(self, mock_get):
+        mock_get.return_value = _make_api_response([
+            _book_item('本A', 'https://example.com/a.jpg'),
+        ])
+        BookThumbnailService.search('本A', '著者B')
+        call_params = mock_get.call_args[1]['params']
+        self.assertIn('intitle:本A', call_params['q'])
+        self.assertIn('inauthor:著者B', call_params['q'])
+
+    @patch('wisme.services.requests.get')
+    def test_max_results_param_is_20(self, mock_get):
+        mock_get.return_value = _make_api_response([])
+        BookThumbnailService.search('何か')
+        call_params = mock_get.call_args[1]['params']
+        self.assertEqual(call_params['maxResults'], '20')
+
+    @patch('wisme.services.requests.get')
+    def test_returns_up_to_20_results(self, mock_get):
+        items = [_book_item(f'本{i}', f'https://example.com/{i}.jpg') for i in range(20)]
+        mock_get.return_value = _make_api_response(items)
+        results = BookThumbnailService.search('本')
+        self.assertEqual(len(results), 20)
+
+    @patch('wisme.services.requests.get')
+    def test_not_capped_at_5(self, mock_get):
+        items = [_book_item(f'本{i}', f'https://example.com/{i}.jpg') for i in range(10)]
+        mock_get.return_value = _make_api_response(items)
+        results = BookThumbnailService.search('本')
+        self.assertGreater(len(results), 5)
+
+    @patch('wisme.services.requests.get')
+    def test_http_url_converted_to_https(self, mock_get):
+        mock_get.return_value = _make_api_response([
+            _book_item('本A', 'http://example.com/a.jpg'),
+        ])
+        results = BookThumbnailService.search('本A')
+        self.assertTrue(results[0]['thumbnail'].startswith('https://'))
+
+    @patch('wisme.services.requests.get')
+    def test_items_without_thumbnail_are_skipped(self, mock_get):
+        mock_get.return_value = _make_api_response([
+            {'volumeInfo': {'title': 'サムネなし', 'imageLinks': {}}},
+            _book_item('サムネあり', 'https://example.com/b.jpg'),
+        ])
+        results = BookThumbnailService.search('本')
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]['title'], 'サムネあり')
+
+    @patch('wisme.services.requests.get', side_effect=Exception('network error'))
+    def test_returns_empty_list_on_api_failure(self, mock_get):
+        results = BookThumbnailService.search('本')
+        self.assertEqual(results, [])
+
+
+# DoD: エンドポイントのアクセス制御・レスポンス形式
+class BookThumbnailSearchViewTest(TestCase):
+    def setUp(self):
+        self.user = make_verified_user('thumb@example.com', 'Testpass123!')
+        self.url = reverse('wisme:book_thumbnail_search')
+
+    def test_requires_login(self):
+        response = self.client.get(self.url + '?title=本A')
+        self.assertEqual(response.status_code, 302)
+
+    def test_returns_empty_results_without_title(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data['results'], [])
+
+    @patch('wisme.services.requests.get')
+    def test_returns_json_with_results_key(self, mock_get):
+        mock_get.return_value = _make_api_response([
+            _book_item('テスト本', 'https://example.com/t.jpg'),
+        ])
+        self.client.force_login(self.user)
+        response = self.client.get(self.url + '?title=テスト本')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], 'application/json')
+        data = json.loads(response.content)
+        self.assertIn('results', data)
+        self.assertIn('title', data['results'][0])
+        self.assertIn('thumbnail', data['results'][0])
+
+
+# DoD: 保存された image_url をもとに詳細画面で表紙画像が表示される
+class PageImageUrlTest(TestCase):
+    def setUp(self):
+        self.user = make_verified_user('imgurl@example.com', 'Testpass123!')
+        self.client.force_login(self.user)
+
+    def test_image_url_field_exists_on_page_model(self):
+        field = Page._meta.get_field('image_url')
+        self.assertTrue(field.null)
+        self.assertTrue(field.blank)
+
+    def test_image_url_is_saved_and_retrievable(self):
+        url = 'https://example.com/cover.jpg'
+        page = Page.objects.create(
+            owner=self.user,
+            title='表紙テスト本',
+            thoughts='',
+            page_date=datetime.date.today(),
+            image_url=url,
+        )
+        page.refresh_from_db()
+        self.assertEqual(page.image_url, url)
+
+    def test_image_url_rendered_in_detail_view(self):
+        url = 'https://example.com/cover.jpg'
+        page = Page.objects.create(
+            owner=self.user,
+            title='表紙テスト本',
+            thoughts='',
+            page_date=datetime.date.today(),
+            image_url=url,
+        )
+        response = self.client.get(reverse('wisme:page_detail', args=[page.id]))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, url)

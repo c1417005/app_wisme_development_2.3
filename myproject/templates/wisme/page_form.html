@@ -56,10 +56,12 @@
 
                 <!-- ファイルアップロード -->
                 <div class="space-y-1">
-                    <p class="text-xs text-stone-400">{% trans "ファイルをアップロード（任意）" %}</p>
-                    <div class="[&_input[type=file]]:text-sm [&_input[type=file]]:text-stone-500">
-                        {{ form.picture }}
-                    </div>
+                    <div class="sr-only">{{ form.picture }}</div>
+                    <label for="{{ form.picture.id_for_label }}"
+                           class="w-full inline-flex items-center justify-center gap-2 border border-dashed border-stone-300 text-stone-500 py-2.5 rounded-lg hover:border-accent-400 hover:text-accent-700 hover:bg-accent-50/30 transition-colors text-sm font-medium cursor-pointer">
+                        <i data-lucide="upload" class="w-4 h-4"></i>
+                        <span id="picture-label-text">{% trans "ファイルをアップロード（任意）" %}</span>
+                    </label>
                     {% if form.picture.errors %}
                     <ul class="text-xs text-red-500">{% for e in form.picture.errors %}<li>{{ e }}</li>{% endfor %}</ul>
                     {% endif %}
@@ -107,21 +109,6 @@
 
                 {{ form.image_url }}
             </div>
-        </div>
-
-        <!-- 本全体の感想セクション (thoughts) -->
-        <div class="relative bg-accent-50/40 rounded-2xl border border-accent-100 p-6 overflow-hidden">
-            <span class="absolute left-0 top-6 bottom-6 w-1 rounded-r bg-accent-500/70" aria-hidden="true"></span>
-            <h2 class="text-xs font-medium text-accent-700 uppercase tracking-widest mb-1">{% trans "本全体の感想" %}</h2>
-            <p class="text-xs text-stone-400 mb-3">{% trans "この本を通して思ったこと、全体を振り返る文章。" %}</p>
-            <div class="[&_textarea]:w-full [&_textarea]:border [&_textarea]:border-stone-200 [&_textarea]:rounded-lg [&_textarea]:px-3 [&_textarea]:py-2 [&_textarea]:text-sm [&_textarea]:bg-white [&_textarea]:outline-none [&_textarea]:transition-colors [&_textarea]:focus:border-accent-500 [&_textarea]:focus:ring-2 [&_textarea]:focus:ring-accent-100 [&_textarea]:resize-none [&_textarea]:h-40">
-                {{ form.thoughts }}
-            </div>
-            {% if form.thoughts.errors %}
-            <ul class="text-xs text-red-500 space-y-0.5 mt-1">
-                {% for e in form.thoughts.errors %}<li>{{ e }}</li>{% endfor %}
-            </ul>
-            {% endif %}
         </div>
 
         <!-- 章ごとのメモセクション (chapters) -->
@@ -191,6 +178,21 @@
             </button>
         </div>
 
+        <!-- 本全体の感想セクション (thoughts) -->
+        <div class="relative bg-accent-50/40 rounded-2xl border border-accent-100 p-6 overflow-hidden">
+            <span class="absolute left-0 top-6 bottom-6 w-1 rounded-r bg-accent-500/70" aria-hidden="true"></span>
+            <h2 class="text-xs font-medium text-accent-700 uppercase tracking-widest mb-1">{% trans "本全体の感想" %}</h2>
+            <p class="text-xs text-stone-400 mb-3">{% trans "この本を通して思ったこと、全体を振り返る文章。" %}</p>
+            <div class="[&_textarea]:w-full [&_textarea]:border [&_textarea]:border-stone-200 [&_textarea]:rounded-lg [&_textarea]:px-3 [&_textarea]:py-2 [&_textarea]:text-sm [&_textarea]:bg-white [&_textarea]:outline-none [&_textarea]:transition-colors [&_textarea]:focus:border-accent-500 [&_textarea]:focus:ring-2 [&_textarea]:focus:ring-accent-100 [&_textarea]:resize-none [&_textarea]:h-40">
+                {{ form.thoughts }}
+            </div>
+            {% if form.thoughts.errors %}
+            <ul class="text-xs text-red-500 space-y-0.5 mt-1">
+                {% for e in form.thoughts.errors %}<li>{{ e }}</li>{% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+
         <button type="submit"
                 class="w-full bg-stone-800 text-white py-2.5 rounded-lg hover:bg-stone-700 transition-colors font-medium text-sm"
                 data-toast="{{ save_toast }}" onclick="showToast(this.dataset.toast)">
@@ -243,6 +245,10 @@
 <script src="/static/wisme/js/chapter_formset.js"></script>
 <script src="/static/wisme/js/thumbnail_search.js"></script>
 <script>
+document.getElementById('{{ form.picture.id_for_label }}').addEventListener('change', function () {
+    const label = document.getElementById('picture-label-text');
+    label.textContent = this.files.length ? this.files[0].name : '{% trans "ファイルをアップロード（任意）" %}';
+});
 const toggle = document.getElementById('mobile-search-toggle');
 const panel  = document.getElementById('mobile-search-panel');
 const close  = document.getElementById('mobile-search-close');

@@ -12,6 +12,7 @@ urlpatterns = [
     path("page/<uuid:id>/delete/",views.page_delete,name = "page_delete"),
     path("search/mean/",views.page_return_mean,name = "page_return_mean"),
     path("words/", views.word_list, name="word_list"),
+    path("words/<int:pk>/delete/", views.word_delete, name="word_delete"),
     path("quiz/", views.flashcard, name="flashcard"),
     path("profile/", views.profile, name="profile"),
     path("profile/update/", views.profile_update, name="profile_update"),

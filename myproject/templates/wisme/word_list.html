@@ -37,6 +37,14 @@
             {% endif %}
         </div>
         <span class="text-xs text-stone-300 shrink-0 pt-0.5">{{ word.created_at|date:"m/d" }}</span>
+        <form method="post" action="{% url 'wisme:word_delete' word.pk %}">
+            {% csrf_token %}
+            <button type="submit"
+                    class="text-stone-300 hover:text-red-400 transition-colors p-1 rounded"
+                    title="{% trans '削除' %}">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+        </form>
     </div>
     {% endfor %}
 </div>

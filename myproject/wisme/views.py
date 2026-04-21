@@ -144,6 +144,15 @@ class WordListView(LoginRequiredMixin, ListView):
         return qs.order_by('-created_at')
 
 
+class WordDeleteView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        word = get_object_or_404(SearchedWord, pk=pk, owner=request.user)
+        word.owner = None
+        word.note = None
+        word.save(update_fields=['owner', 'note'])
+        return redirect('wisme:word_list')
+
+
 class FlashcardView(LoginRequiredMixin, ListView):
     model = SearchedWord
     template_name = 'wisme/flashcard.html'
@@ -179,6 +188,7 @@ page_update = PageUpdateView.as_view()
 page_delete = PageDeleteView.as_view()
 page_return_mean = PageSendWordReturnMean.as_view()
 word_list = WordListView.as_view()
+word_delete = WordDeleteView.as_view()
 flashcard = FlashcardView.as_view()
 profile = UserProfileView.as_view()
 profile_update = UserProfileUpdateView.as_view()

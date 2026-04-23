@@ -103,3 +103,18 @@ class SearchedWord(models.Model):
 
     def __str__(self):
         return self.word
+
+
+class Feedback(models.Model):
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_("送信者"),
+    )
+    message = models.TextField(max_length=2000, verbose_name=_("メッセージ"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("送信日時"))
+
+    def __str__(self):
+        return self.message[:30]

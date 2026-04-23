@@ -117,4 +117,34 @@
 
 {% endif %}
 
+<!-- フィードバックフォーム -->
+<section class="mt-16 border-t border-stone-200 pt-10">
+    <div class="max-w-xl mx-auto">
+        <h3 class="text-sm font-medium text-stone-500 uppercase tracking-widest mb-1">{% trans "フィードバック" %}</h3>
+        <p class="text-stone-400 text-sm mb-5">{% trans "ご意見・ご要望・不具合報告などをお気軽にどうぞ。" %}</p>
+        <form method="post" action="{% url 'wisme:feedback_submit' %}">
+            {% csrf_token %}
+            <textarea name="message" rows="4" maxlength="2000" required
+                      class="w-full border border-stone-200 rounded-xl px-4 py-3 text-sm text-stone-700 bg-white placeholder-stone-300 focus:outline-none focus:border-stone-400 resize-none"
+                      placeholder="{% trans 'ご意見・ご要望・不具合報告などをお気軽にどうぞ' %}"></textarea>
+            <div class="flex justify-end mt-3">
+                <button type="submit"
+                        class="inline-flex items-center gap-2 bg-stone-800 text-white px-5 py-2 rounded-lg hover:bg-stone-700 transition-colors text-sm font-medium">
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                    {% trans "送信する" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+
+{% if feedback_sent %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    showToast("{% trans 'フィードバックを送信しました。ありがとうございます！' %}");
+    history.replaceState(null, '', location.pathname);
+});
+</script>
+{% endif %}
+
 {% endblock %}

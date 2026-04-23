@@ -3,8 +3,8 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic.edit import UpdateView
 from django.views.generic import ListView
-from django.urls import reverse_lazy
-from .forms import PageForm, UserProfileForm, ChapterFormSet
+from django.urls import reverse_lazy, reverse
+from .forms import PageForm, UserProfileForm, ChapterFormSet, FeedbackForm
 from .models import Page, SearchedWord, CustomUser
 from django.http import JsonResponse
 from .services import WordService, BookThumbnailService
@@ -17,8 +17,21 @@ class IndexView(LoginRequiredMixin, View):
             'page_count': pages.count(),
             'latest_page': latest,
             'last_updated_at': latest.update_at.isoformat() if latest else '',
+            'feedback_form': FeedbackForm(),
+            'feedback_sent': request.GET.get('feedback') == 'sent',
         }
         return render(request, "wisme/index.html", ctx)
+
+
+class FeedbackSubmitView(LoginRequiredMixin, View):
+    def post(self, request):
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            feedback = form.save(commit=False)
+            feedback.owner = request.user
+            feedback.save()
+            return redirect(reverse('wisme:index') + '?feedback=sent')
+        return redirect('wisme:index')
 
 
 class PageCreateView(LoginRequiredMixin, View):
@@ -193,3 +206,4 @@ flashcard = FlashcardView.as_view()
 profile = UserProfileView.as_view()
 profile_update = UserProfileUpdateView.as_view()
 book_thumbnail_search = BookThumbnailSearchView.as_view()
+feedback_submit = FeedbackSubmitView.as_view()

@@ -17,4 +17,5 @@ urlpatterns = [
     path("profile/", views.profile, name="profile"),
     path("profile/update/", views.profile_update, name="profile_update"),
     path("books/thumbnail/", views.book_thumbnail_search, name="book_thumbnail_search"),
+    path("feedback/submit/", views.feedback_submit, name="feedback_submit"),
 ]

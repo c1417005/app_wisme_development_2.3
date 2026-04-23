@@ -2,7 +2,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.core import mail
 from allauth.account.models import EmailAddress
-from wisme.models import CustomUser, Page, Chapter, SearchedWord
+from wisme.models import CustomUser, Page, Chapter, SearchedWord, Feedback
 from wisme.services import BookThumbnailService
 from unittest.mock import patch, MagicMock
 import datetime
@@ -654,3 +654,66 @@ class PageImageUrlTest(TestCase):
         response = self.client.get(reverse('wisme:page_detail', args=[page.id]))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, url)
+
+
+# --- 014 フィードバックフォーム ---
+
+# DoD: ログイン済みユーザーがフォームを送信すると Feedback レコードに owner が紐づいて保存される
+class FeedbackSubmitTest(TestCase):
+    def setUp(self):
+        self.user = make_verified_user('fb@example.com', 'Testpass123!')
+        self.url = reverse('wisme:feedback_submit')
+
+    def test_logged_in_user_can_submit_feedback(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, {'message': 'テストメッセージ'})
+        self.assertEqual(Feedback.objects.count(), 1)
+
+    def test_feedback_owner_is_logged_in_user(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, {'message': 'オーナーテスト'})
+        self.assertEqual(Feedback.objects.first().owner, self.user)
+
+    # DoD: 送信成功後、index ページへリダイレクトされ ?feedback=sent が付く
+    def test_submit_redirects_to_index_with_feedback_sent_param(self):
+        self.client.force_login(self.user)
+        response = self.client.post(self.url, {'message': 'リダイレクトテスト'})
+        self.assertRedirects(
+            response,
+            reverse('wisme:index') + '?feedback=sent',
+            fetch_redirect_response=False,
+        )
+
+    # DoD: 空のメッセージを送信した場合、Feedback レコードは作成されない
+    def test_empty_message_does_not_save_feedback(self):
+        self.client.force_login(self.user)
+        self.client.post(self.url, {'message': ''})
+        self.assertEqual(Feedback.objects.count(), 0)
+
+    # DoD: 未ログインユーザーはログインページへリダイレクトされる
+    def test_unauthenticated_user_redirected_to_login(self):
+        response = self.client.post(self.url, {'message': '未ログイン'})
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('/accounts/login/', response['Location'])
+
+
+# DoD: メッセージの最大文字数（2000 字）を超えた入力は保存されない
+class FeedbackMaxLengthTest(TestCase):
+    def setUp(self):
+        self.user = make_verified_user('fbmax@example.com', 'Testpass123!')
+        self.client.force_login(self.user)
+
+    def test_message_over_2000_chars_is_rejected(self):
+        self.client.post(reverse('wisme:feedback_submit'), {'message': 'a' * 2001})
+        self.assertEqual(Feedback.objects.count(), 0)
+
+
+# DoD: CSRF トークンがフォームに含まれている
+class FeedbackCSRFTest(TestCase):
+    def setUp(self):
+        self.user = make_verified_user('fbcsrf@example.com', 'Testpass123!')
+
+    def test_index_contains_csrf_token_in_feedback_form(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('wisme:index'))
+        self.assertContains(response, 'csrfmiddlewaretoken')

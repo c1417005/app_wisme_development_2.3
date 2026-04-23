@@ -1,7 +1,7 @@
 from django.forms import ModelForm, inlineformset_factory
 from django import forms
 from django.utils.translation import gettext_lazy as _
-from .models import Page, Chapter, CustomUser
+from .models import Page, Chapter, CustomUser, Feedback
 
 
 class UserProfileForm(ModelForm):
@@ -33,6 +33,19 @@ class ChapterForm(ModelForm):
             'title': forms.TextInput(attrs={'placeholder': _('章タイトル（任意）')}),
             'content': forms.Textarea(attrs={'placeholder': _('この章の内容'), 'rows': 6}),
             'order': forms.HiddenInput(),
+        }
+
+
+class FeedbackForm(forms.ModelForm):
+    class Meta:
+        model = Feedback
+        fields = ['message']
+        widgets = {
+            'message': forms.Textarea(attrs={
+                'rows': 4,
+                'maxlength': 2000,
+                'placeholder': _('ご意見・ご要望・不具合報告などをお気軽にどうぞ'),
+            }),
         }
 
 

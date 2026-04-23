@@ -117,17 +117,19 @@ DEBUG=True
 
 ## 5. インフラとデプロイ
 
-- **PythonAnywhere** — 無料プランで開発スタート。DB は PostgreSQL。
+- **Heroku** — Eco Dyno（$5/月）+ PostgreSQL Essential-0（$5/月）= **$10/月**。GitHub Student Developer Pack の $13 クレジットで運用。
 - 将来的に AWS/GCP への移行を視野に入れたスケーラブルな設計を意識する。
 
 ### 環境変数管理
 - `django-environ` を使い、`SECRET_KEY`・`DATABASE_URL`・`GOOGLE_GEMINI_API_KEY`・`GOOGLE_BOOKS_API_KEY` 等をすべて `.env` から読み込む。
-- 本番サーバーでは `.env` ではなく OS 環境変数（PythonAnywhere の Web タブで設定）を使用する。
+- 本番サーバーでは `.env` ではなく **Heroku Config Vars**（`heroku config:set KEY=VALUE` または Heroku ダッシュボード）で設定する。
+- `DATABASE_URL` は PostgreSQL アドオン追加時に Heroku が自動設定する。
 - `.env.example` をリポジトリに含め、必要なキーを明示する（値は空欄）。
 
 ### メディア・静的ファイル
 - `MEDIA_ROOT` / `MEDIA_URL` を `settings.py` で明示的に設定する。
-- 本番環境では Django からメディアを直接配信せず、PythonAnywhere の Static Files マッピングか、将来的には S3 等のオブジェクトストレージを利用する。
+- Heroku の Dyno は **Ephemeral Filesystem** のため、デプロイのたびにアップロードファイルが消滅する。将来的には `django-storages` + AWS S3 への移行を推奨する。
+- 静的ファイルは **WhiteNoise** で配信する（`whitenoise.middleware.WhiteNoiseMiddleware` を SecurityMiddleware の直後に追加）。
 - `django-storages` + `boto3` を使い、ストレージバックエンドを差し替え可能な設計にしておく。
 
 ---
@@ -184,7 +186,7 @@ DEBUG=True
 | 007 | 推薦図書機能（ダッシュボードカルーセル） | **廃止** | — |
 | 008 | 多言語対応（i18n） | 未着手 | 未作成 |
 | 009 | セキュリティ強化 | 未着手 | 未作成 |
-| 010 | PythonAnywhere デプロイ | 未着手 | 未作成 |
+| 010 | Heroku デプロイ | 未着手 | 未作成 |
 | 011 | UI/UX 実装（デザインシステム・全画面フロントエンド） | 未着手 | 未作成 |
 | 012 | 章単位メモ機能（Chapter モデル・動的フォーム） | 完了 | 完了（6件） |
 | 013 | 書籍サムネイル自動取得（Google Books API） | 完了 | 未作成 |

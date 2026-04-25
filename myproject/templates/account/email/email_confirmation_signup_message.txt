@@ -1,0 +1,12 @@
+{% autoescape off %}{% load account i18n %}{% user_display user as user_display %}{% blocktrans with site_name=current_site.name site_domain=current_site.domain %}こんにちは。
+
+{{ site_name }} にご登録いただき、ありがとうございます。
+
+以下のリンクをクリックして、メールアドレスを確認してください。
+
+{{ activate_url }}
+
+このメールに心当たりがない場合は、無視していただいて構いません。
+
+{{ site_name }} チーム
+{{ site_domain }}{% endblocktrans %}{% endautoescape %}

@@ -34,6 +34,8 @@ GOOGLE_BOOKS_API_KEY=<your Google Books API key>
 SECRET_KEY=<Django secret key>
 DATABASE_URL=<DB接続文字列（本番はPostgreSQL）>
 DEBUG=True
+RESEND_API_KEY=<Resend ダッシュボードで発行した API キー>
+DEFAULT_FROM_EMAIL=<送信元メールアドレス（例: noreply@yourdomain.com）>
 ```
 
 - 環境変数の読み込みには **`django-environ`** を使用する（`python-dotenv` から移行予定）。
@@ -90,7 +92,7 @@ DEBUG=True
 ## 4. 計画中の機能（要件）
 
 ### 近期
-- **ユーザー認証** — メール/パスワード登録 + Google OAuth。`django-allauth` を使用。ログイン必須画面には `LoginRequiredMixin` を適用。認証基盤は `CustomUser`（`AbstractUser`継承）で構築済みであること。
+- **メール認証基盤**（ticket 015）— django-allauth によるメールアドレス確認・パスワードリセット。メール送信は Resend SMTP リレーを使用。ローカルはコンソール出力、本番は `DEBUG=False` で自動切替。
 - **単語帳** — 保存済み `SearchedWord` の一覧・ソート（アルファベット順/登録順）。
 - **クイズ機能** — Page と SearchedWord を組み合わせた復習クイズ。出題・解答判定・結果記録。
 
@@ -121,7 +123,7 @@ DEBUG=True
 - 将来的に AWS/GCP への移行を視野に入れたスケーラブルな設計を意識する。
 
 ### 環境変数管理
-- `django-environ` を使い、`SECRET_KEY`・`DATABASE_URL`・`GOOGLE_GEMINI_API_KEY`・`GOOGLE_BOOKS_API_KEY` 等をすべて `.env` から読み込む。
+- `django-environ` を使い、`SECRET_KEY`・`DATABASE_URL`・`GOOGLE_GEMINI_API_KEY`・`GOOGLE_BOOKS_API_KEY`・`RESEND_API_KEY`・`DEFAULT_FROM_EMAIL` 等をすべて `.env` から読み込む。
 - 本番サーバーでは `.env` ではなく **Heroku Config Vars**（`heroku config:set KEY=VALUE` または Heroku ダッシュボード）で設定する。
 - `DATABASE_URL` は PostgreSQL アドオン追加時に Heroku が自動設定する。
 - `.env.example` をリポジトリに含め、必要なキーを明示する（値は空欄）。
@@ -190,6 +192,8 @@ DEBUG=True
 | 011 | UI/UX 実装（デザインシステム・全画面フロントエンド） | 未着手 | 未作成 |
 | 012 | 章単位メモ機能（Chapter モデル・動的フォーム） | 完了 | 完了（6件） |
 | 013 | 書籍サムネイル自動取得（Google Books API） | 完了 | 未作成 |
+| 014 | フィードバックフォームの実装 | 完了 | 完了（一部） |
+| 015 | メール認証基盤（django-allauth + Resend） | 完了 | 完了（4件） |
 
 > チケットの DoD チェックボックスは **自動テスト（`python manage.py test`）が通過した項目のみ** `[x]` とする。
 

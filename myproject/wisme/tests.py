@@ -1,7 +1,7 @@
 from django.test import TestCase, override_settings
 from django.urls import reverse
 from django.core import mail
-from allauth.account.models import EmailAddress
+from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 from wisme.models import CustomUser, Page, Chapter, SearchedWord, Feedback
 from wisme.services import BookThumbnailService
 from unittest.mock import patch, MagicMock
@@ -717,3 +717,65 @@ class FeedbackCSRFTest(TestCase):
         self.client.force_login(self.user)
         response = self.client.get(reverse('wisme:index'))
         self.assertContains(response, 'csrfmiddlewaretoken')
+
+
+# --- 015 メール認証基盤（django-allauth + Resend） ---
+
+# DoD: 新規登録後、EmailAddress オブジェクトが未確認状態で作成される
+class EmailAddressCreatedUnverifiedTest(TestCase):
+    @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+    def test_email_address_created_as_unverified_after_signup(self):
+        self.client.post(reverse('account_signup'), {
+            'email': 'unverified@example.com',
+            'password1': 'Testpass123!',
+            'password2': 'Testpass123!',
+        })
+        ea = EmailAddress.objects.get(email='unverified@example.com')
+        self.assertFalse(ea.verified)
+
+
+# DoD: 確認リンクへの GET リクエストにより、EmailAddress.verified が True になる
+class EmailConfirmationVerifiesAddressTest(TestCase):
+    @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+    def test_confirm_email_link_sets_verified_true(self):
+        self.client.post(reverse('account_signup'), {
+            'email': 'toconfirm@example.com',
+            'password1': 'Testpass123!',
+            'password2': 'Testpass123!',
+        })
+        ea = EmailAddress.objects.get(email='toconfirm@example.com')
+        confirmation = EmailConfirmationHMAC(ea)
+        self.client.post(reverse('account_confirm_email', args=[confirmation.key]))
+        ea.refresh_from_db()
+        self.assertTrue(ea.verified)
+
+
+# DoD: パスワードリセット申請後、対象ユーザーにリセットトークンが発行される
+class PasswordResetTokenTest(TestCase):
+    @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+    def test_password_reset_request_sends_email_with_reset_link(self):
+        make_verified_user('resetme@example.com', 'Testpass123!')
+        self.client.post(reverse('account_reset_password'), {'email': 'resetme@example.com'})
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn('resetme@example.com', mail.outbox[0].to)
+        self.assertIn('password', mail.outbox[0].body.lower())
+
+
+# DoD: 未確認ユーザーが保護ページにアクセスすると、ログインページにリダイレクトされる
+class UnverifiedUserProtectedPageTest(TestCase):
+    @override_settings(EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend')
+    def test_unverified_user_cannot_access_protected_page(self):
+        # 登録後はメール未確認でセッションもない状態
+        self.client.post(reverse('account_signup'), {
+            'email': 'unver2@example.com',
+            'password1': 'Testpass123!',
+            'password2': 'Testpass123!',
+        })
+        # 新しいクライアントセッションで保護ページにアクセス
+        self.client.logout()
+        response = self.client.get(reverse('wisme:index'))
+        self.assertRedirects(
+            response,
+            '/accounts/login/?next=/wisme/',
+            fetch_redirect_response=False,
+        )

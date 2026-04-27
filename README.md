@@ -29,7 +29,9 @@ https://github.com/user-attachments/assets/6afecaf1-349e-469f-9b66-0d0af040c138
 
 URL:      https://wisme-a56163e25cb0.herokuapp.com/wisme/
 
-ログイン:  demo@example.com
+ログイン  
+
+アカウント：demo@example.com
 パスワード: demo1234
 
 アカウント作成が上手くいかない場合、googleログインもしくは

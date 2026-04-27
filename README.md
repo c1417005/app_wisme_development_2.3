@@ -25,13 +25,14 @@ https://github.com/user-attachments/assets/6afecaf1-349e-469f-9b66-0d0af040c138
 
 
 ## 🛠 使い方 (Usage)
-リポジトリをクローンして移動します。
+下記のURLからサイトに移動してください。
 
-```bash
-git clone [https://github.com/c1417005/app_wisme_development_2.3.git](https://github.com/c1417005/app_wisme_development_2.3.git)
-cd app_wisme_development_2.3
-```
+URL:      https://wisme-a56163e25cb0.herokuapp.com/wisme/
+ログイン:  demo@example.com
+パスワード: demo1234
+
+アカウント作成が上手くいかない場合、googleログインもしくは
+上記のdemoアカウントを使ってログインしてください。
 
 
-## 📝 設定 (Configuration)
-.env ファイルに Gemini APIキーを設定してください。
+

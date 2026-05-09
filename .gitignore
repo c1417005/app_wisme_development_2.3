@@ -5,3 +5,4 @@ myproject/db.sqlite3
 .JPG
 .github
 heroku-config-backup.txt
+.claude

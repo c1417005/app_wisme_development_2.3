@@ -6,3 +6,4 @@ myproject/db.sqlite3
 .github
 heroku-config-backup.txt
 .claude
+memo/

@@ -26,7 +26,7 @@
 
 ## 🛠 使い方 (Usage)
 下記のURLからサイトに移動してください。
-
+※現在公開停止中
 URL:      https://wisme-a56163e25cb0.herokuapp.com/wisme/
 
 ログイン  

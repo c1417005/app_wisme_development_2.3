@@ -7,3 +7,4 @@ myproject/db.sqlite3
 heroku-config-backup.txt
 .claude
 memo/
+myproject/myproject/settings.py

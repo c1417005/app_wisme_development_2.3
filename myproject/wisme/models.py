@@ -10,7 +10,7 @@ import uuid
 class CustomUser(AbstractUser):
     display_name = EncryptedCharField(max_length=100, blank=True, verbose_name=_("表示名"))
     profile_image = models.ImageField(
-        upload_to='media/profile/', blank=True, null=True, verbose_name=_("プロフィール画像")
+        upload_to='profile/', blank=True, null=True, verbose_name=_("プロフィール画像")
     )
 
     def save(self, *args, **kwargs):
